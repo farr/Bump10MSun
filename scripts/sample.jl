@@ -12,10 +12,10 @@ using Turing
 
 Nmcmc = 1000
 Nchain = Threads.nthreads()
-Npost = 128
-Nsel = 4096
+Npost = 256
+Nsel = 2048
 
-log_dN_default = make_log_dN(1.0, -1.0, 10.0, 2.0)
+log_dN_default = make_log_dN(0.0, -4.0, 10.0, 0.0)
 
 samps = []
 fnames = []
@@ -58,7 +58,7 @@ m1s = [[xs[i].mass_1_source for i in is] for (xs, is) in zip(narrow_samps, inds)
 m2s = [[xs[i].mass_2_source for i in is] for (xs, is) in zip(narrow_samps, inds)]
 log_wts = [[log(w[i]) for i in is] for (w, is) in zip(pop_wts, inds)]
 
-m1s_sel, m2s_sel, zs_sel, pdraw, Ndraw = read_selection("/Users/wfarr/Research/o3b_data/O3-Sensitivity/endo3_bbhpop-LIGO-T2100113-v12.hdf5")
+m1s_sel, m2s_sel, zs_sel, pdraw, Ndraw = read_selection("/Users/wfarr/Research/o3b_data/O3-Sensitivity/endo3_mixture-LIGO-T2100113-v12.hdf5")
 pdraw = pdraw ./ (md_sfr_zwt.(zs_sel) ./ md_sfr(zref))
 m1s_sel, m2s_sel, pdraw, Ndraw = resample_selection(log_dN_default, m1s_sel, m2s_sel, pdraw, Ndraw)
 @info "Number of resampled selection function samples = $(Ndraw)"

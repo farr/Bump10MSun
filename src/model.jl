@@ -1,5 +1,5 @@
 """The minimum mass considered."""
-const mlow = 3.0
+const mlow = 1.0
 
 """The maximum mass considered."""
 const mhigh = 20.0
