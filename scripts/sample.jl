@@ -15,7 +15,7 @@ Nchain = Threads.nthreads()
 Npost = 128
 Nsel = 4096
 
-log_dN_default = make_log_dN(1.0, -1.0, 10.0, 2.0)
+log_dN_default = make_log_dN(1.0, -1.0, 10.0, 0.7, 0.5)
 
 samps = []
 fnames = []
