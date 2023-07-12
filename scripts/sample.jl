@@ -54,6 +54,8 @@ neffs = [sum(w)^2 / sum(w.^2) for w in wts]
 @info @sprintf("Minimum PE Neff = %.1f", minimum(neffs))
 inds = [sample(1:length(w), weights(w), Npost) for w in wts]
 
+@info @sprintf("Maximum of 99%% redshift in sample is %.1f", maximum([quantile([x.redshift for x in s], 0.99) for s in narrow_samps]))
+
 m1s = [[xs[i].mass_1_source for i in is] for (xs, is) in zip(narrow_samps, inds)]
 m2s = [[xs[i].mass_2_source for i in is] for (xs, is) in zip(narrow_samps, inds)]
 log_wts = [[log(w[i]) for i in is] for (w, is) in zip(pop_wts, inds)]
