@@ -70,11 +70,16 @@ m2s_sel = m2s_sel[1:Nsel]
 pdraw = pdraw[1:Nsel]
 
 model = broken_pl_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log.(pdraw), Ndraw)
-trace = sample(model, NUTS(), Nmcmc)
+
+if Nchain == 1
+    trace = sample(model, NUTS(), Nmcmc)
+else
+    trace = sample(model, NUTS(), MCMCThreads(), Nmcmc, Nchain)
+end
 trace = with_logger(NullLogger()) do 
     append_generated_quantities(trace, generated_quantities(model, trace))
 end
-@info @sprintf("Minimum Neff_sel = %.1f", minimum(trace[:Neff_sel]))
+@info @sprintf("Minimum Neff_sel = %.1f, 4*nobs = %d", minimum(trace[:Neff_sel]), 4*sum(mask))
 @info @sprintf("Minimum Neff_samps = %.1f", minimum([minimum(trace[n]) for n in namesingroup(trace, :Neff_samps)]))
 
 h5open(joinpath(@__DIR__, "..", "chains", "chains.h5"), "w") do f

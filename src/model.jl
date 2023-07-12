@@ -115,6 +115,25 @@ function make_dNdq(a1, a2, mb, mu_q, sigma_q)
 end
 
 """
+Returns a function representing the "common" black hole mass function, ``f_m``
+above.
+"""
+function make_dNdm(a1, a2, mb)
+    m -> begin
+        exp(_fm(m, a1, a2, mb))/m     
+    end
+end
+
+"""
+Returns the "pairing probability", the function ``g(q)``.
+"""
+function make_pairing_prob(mu_q, sigma_q)
+    q -> begin
+        exp(-0.5*square((q-mu_q)/sigma_q) + 0.5*square((1-mu_q)/sigma_q))
+    end
+end
+
+"""
     broken_pl_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
 
 Returns a Turing model for our broken power law mass function.
