@@ -38,6 +38,13 @@ end
 narrow_samps = samps[mask]
 narrow_fnames = fnames[mask]
 
+open(joinpath(@__DIR__, "..", "chains", "chains_fnames.txt"), "w") do f
+    for n in narrow_fnames
+        write(f, n)
+        write(f, "\n")
+    end
+end
+
 pop_wts_and_wts = map(narrow_samps) do samps
     map(samps) do s
         m1 = s.mass_1_source

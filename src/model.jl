@@ -157,10 +157,11 @@ Returns a Turing model for our broken power law mass function.
 - `a1`: The low-mass power law slope.
 - `a2`: The high-mass power law slope.
 - `mb`: The break mass.
-- `beta`: The pairing power law exponent.
+- `mu_q`: The peak of the pairing function Gaussian.
+- `sigma_q`: The width of the pairing function Gaussian.
 - `R`: (generated) The volumetric merger rate per natural log mass squared at
   `m1 = m2 = mb`.
-- `Neff_sel`: The effective number of samples (see [Farr
+- `Neff_sel`: (generated) The effective number of samples (see [Farr
   (2019)](https://iopscience.iop.org/article/10.3847/2515-5172/ab1d5f)) in the
   Monte-Carlo selection integral.
 """
@@ -204,5 +205,21 @@ Returns a Turing model for our broken power law mass function.
 
     R = rand(Normal(mu_R, sigma_R))
     
-    return (R = R, Neff_sel = Neff_sel, Neff_samps = Neff_samps)
+    m1_m2_draw = map(m1s, m2s, log_wts) do mm1, mm2, log_wwt
+        i = rand(Categorical(exp.(log_wwt .- logsumexp(log_wwt))))
+        (mm1[i], mm2[i])
+    end
+
+    m1s_draw = map(m1_m2_draw) do m1_m2
+        m1_m2[1]
+    end
+    m2s_draw = map(m1_m2_draw) do m1_m2
+        m1_m2[2]
+    end
+
+    i_sel = rand(Categorical(exp.(log_wts_sel .- logsumexp(log_wts_sel))))
+    m1_draw_sel = m1s_sel[i_sel]
+    m2_draw_sel = m2s_sel[i_sel]
+    
+    return (R = R, Neff_sel = Neff_sel, Neff_samps = Neff_samps, m1s_popwt = m1s_draw, m2s_popwt = m2s_draw, m1_draw=m1_draw_sel, m2_draw=m2_draw_sel)
 end

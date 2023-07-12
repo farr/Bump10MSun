@@ -1,6 +1,7 @@
 module Bump10MSun
 
 using Cosmology
+using Distributions
 using HDF5
 using StatsBase
 using StatsFuns
