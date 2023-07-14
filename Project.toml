@@ -4,7 +4,11 @@ authors = ["Will M. Farr <will.farr@ligo.org>"]
 version = "0.1.0"
 
 [deps]
+ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
+ArviZ = "131c737c-5715-5e2e-ad31-c244f01c1dc7"
+Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"
 Cosmology = "76746363-e552-5dba-9a5a-cef6fa9cc5ab"
+DimensionalData = "0703355e-b756-11e9-17c0-8b28908087d0"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 Glob = "c27321d9-0574-5035-807b-f59d2c89b15c"

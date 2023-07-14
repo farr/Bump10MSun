@@ -1,6 +1,8 @@
 using Pkg
 Pkg.activate(joinpath(@__DIR__, ".."))
 
+using ArgParse
+using ArviZ
 using Bump10MSun
 using Glob
 using HDF5
@@ -10,10 +12,54 @@ using Printf
 using StatsBase
 using Turing
 
-Nmcmc = 1000
+s = ArgParseSettings()
+
+@add_arg_table s begin
+    "--nmcmc"
+        help = "Number of MCMC iterations"
+        default = 1000
+        arg_type = Int
+    "--npost"
+        help = "Number of posterior samples to draw"
+        default = 256
+        arg_type = Int
+    "--nsel"
+        help = "Number of samples to select"
+        default = 4096
+        arg_type = Int
+    "--model"
+        help = "Model to fit, one of [broken_pl, two_broken_pl]"
+        default = "broken_pl"
+        arg_type = String
+    "--target_accept"
+        help = "Target acceptance rate for HMC"
+        default = 0.85
+        arg_type = Float64
+end
+
+parsed_args = parse_args(s)
+
+Nmcmc = parsed_args["nmcmc"]
 Nchain = Threads.nthreads()
-Npost = 128
-Nsel = 4096
+Npost = parsed_args["npost"]
+Nsel = parsed_args["nsel"]
+target_accept = parsed_args["target_accept"]
+
+model_functions = Dict(
+    "broken_pl" => broken_pl_model,
+    "two_broken_pl" => two_broken_pl_model
+)
+model_suffixes = Dict(
+    "broken_pl" => "",
+    "two_broken_pl" => "_tb"
+)
+
+if parsed_args["model"] in keys(model_functions)
+    model = model_functions[parsed_args["model"]]
+    suffix = model_suffixes[parsed_args["model"]]
+else
+    error("--model argument must be one of $(keys(model_functions)); got $(parsed_args["model"])")
+end
 
 log_dN_default = make_log_dN(1.0, -1.0, 10.0, 0.7, 0.5)
 
@@ -37,8 +83,9 @@ mask = map(samps) do ss
 end
 narrow_samps = samps[mask]
 narrow_fnames = fnames[mask]
+narrow_gwnames = [String(match(r"^.*(GW[0-9]+[_]*[0-9]*).*$", f)[1]) for f in narrow_fnames]
 
-open(joinpath(@__DIR__, "..", "chains", "chains_fnames.txt"), "w") do f
+open(joinpath(@__DIR__, "..", "chains", "chain" * suffix * "_fnames.txt"), "w") do f
     for n in narrow_fnames
         write(f, n)
         write(f, "\n")
@@ -78,12 +125,12 @@ m1s_sel = m1s_sel[1:Nsel]
 m2s_sel = m2s_sel[1:Nsel]
 pdraw = pdraw[1:Nsel]
 
-model = broken_pl_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log.(pdraw), Ndraw)
+model = model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log.(pdraw), Ndraw)
 
 if Nchain == 1
-    trace = sample(model, NUTS(), Nmcmc)
+    trace = sample(model, NUTS(Nmcmc, target_accept), Nmcmc)
 else
-    trace = sample(model, NUTS(), MCMCThreads(), Nmcmc, Nchain)
+    trace = sample(model, NUTS(Nmcmc, target_accept), MCMCThreads(), Nmcmc, Nchain)
 end
 trace = with_logger(NullLogger()) do 
     append_generated_quantities(trace, generated_quantities(model, trace))
@@ -91,6 +138,6 @@ end
 @info @sprintf("Minimum Neff_sel = %.1f, 4*nobs = %d", minimum(trace[:Neff_sel]), 4*sum(mask))
 @info @sprintf("Minimum Neff_samps = %.1f", minimum([minimum(trace[n]) for n in namesingroup(trace, :Neff_samps)]))
 
-h5open(joinpath(@__DIR__, "..", "chains", "chains.h5"), "w") do f
-    write(f, trace)
-end
+idata = from_mcmcchains(trace, coords=Dict(:gwnames => narrow_gwnames), dims=(Neff_samps=(:gwnames,), m1s_popwt=(:gwnames,), m2s_popwt=(:gwnames,)), library="Turing")
+
+to_netcdf(idata, joinpath(@__DIR__, "..", "chains", "chain" * suffix * ".nc"))
