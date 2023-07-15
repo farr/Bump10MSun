@@ -28,7 +28,7 @@ s = ArgParseSettings()
         default = 4096
         arg_type = Int
     "--model"
-        help = "Model to fit, one of [broken_pl, two_broken_pl]"
+        help = "Model to fit, one of [broken_pl, two_broken_pl, broken_pl_plp, two_broken_pl_plp]"
         default = "broken_pl"
         arg_type = String
     "--target_accept"
@@ -47,11 +47,15 @@ target_accept = parsed_args["target_accept"]
 
 model_functions = Dict(
     "broken_pl" => broken_pl_model,
-    "two_broken_pl" => two_broken_pl_model
+    "two_broken_pl" => two_broken_pl_model,
+    "broken_pl_plp" => broken_pl_plp_model,
+    "two_broken_pl_plp" => two_broken_pl_plp_model
 )
 model_suffixes = Dict(
     "broken_pl" => "",
-    "two_broken_pl" => "_tb"
+    "two_broken_pl" => "_tb",
+    "broken_pl_plp" => "_plp",
+    "two_broken_pl_plp" => "_tb_plp"
 )
 
 if parsed_args["model"] in keys(model_functions)
