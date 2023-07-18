@@ -24,8 +24,8 @@ s = ArgParseSettings()
         default = 256
         arg_type = Int
     "--nsel"
-        help = "Number of samples to select"
-        default = 4096
+        help = "Number of detected injections to use to estimate the selection normalization"
+        default = 8192
         arg_type = Int
     "--model"
         help = "Model to fit, one of [broken_pl, two_broken_pl, broken_pl_plp, two_broken_pl_plp]"
@@ -49,13 +49,15 @@ model_functions = Dict(
     "broken_pl" => broken_pl_model,
     "two_broken_pl" => two_broken_pl_model,
     "broken_pl_plp" => broken_pl_plp_model,
-    "two_broken_pl_plp" => two_broken_pl_plp_model
+    "two_broken_pl_plp" => two_broken_pl_plp_model,
+    "pl_plus_gaussian" => power_law_plus_gaussian_model
 )
 model_suffixes = Dict(
     "broken_pl" => "",
     "two_broken_pl" => "_tb",
     "broken_pl_plp" => "_plp",
-    "two_broken_pl_plp" => "_tb_plp"
+    "two_broken_pl_plp" => "_tb_plp",
+    "pl_plus_gaussian" => "_plg"
 )
 
 if parsed_args["model"] in keys(model_functions)
@@ -65,7 +67,7 @@ else
     error("--model argument must be one of $(keys(model_functions)); got $(parsed_args["model"])")
 end
 
-log_dN_default = make_log_dN(1.0, -1.0, 10.0, 0.7, 0.5)
+log_dN_default = make_log_dN(BrokenPowerLaw(), GaussianPairing(), 1.0, -1.0, 10.0, 0.7, 0.5)
 
 samps = []
 fnames = []

@@ -12,10 +12,13 @@ using Trapz
 
 include("model.jl")
 export mlow, mhigh, zref
+export MassFunction, BrokenPowerLaw, TwoBrokenPowerLaw, PowerLawGaussian
+export PairingFunction, GaussianPairing, PowerLawPairing
 export model_body
 export make_log_dN, make_log_dN_tb
 export broken_pl_model, two_broken_pl_model
 export broken_pl_plp_model, two_broken_pl_plp_model
+export power_law_plus_gaussian_model
 export make_dNdm1, make_dNdm2, make_dNdq, make_dNdm, make_pairing_prob
 
 include("weights.jl")

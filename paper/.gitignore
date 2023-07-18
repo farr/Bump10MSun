@@ -1,0 +1,7 @@
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+Bump10MSun.pdf
+*.synctex.gz
