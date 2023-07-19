@@ -682,8 +682,8 @@ pairing function.
 end
 
 @model function power_law_plus_gaussian_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
-  a1 ~ Uniform(-5, 5)
-  a2 ~ Uniform(-5, 5)
+  a1 ~ Uniform(-10, 10)
+  a2 ~ Uniform(-10, 10)
   mu ~ Uniform(5, 18)
   sigma ~ Uniform(0.25, 10)
   fg ~ Uniform(0, 1)
