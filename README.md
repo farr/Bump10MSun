@@ -1,6 +1,6 @@
 # Fitting Broken Power Laws to the Low-Mass LVK Bump
 
-[![https://img.shields.io/badge/Paper-PDF]](https://api.github.com/repos/farr/Bump10MSun/actions/artifacts/Bump10MSun/PDF)
+[![Paper PDF](https://img.shields.io/badge/Paper-PDF)](https://github.com/farr/Bump10MSun/blob/main-pdf/paper/Bump10MSun.pdf)
 
 What it says on the tin.  We only fit the O3 confident events (O3a and O3b)
 because these are the only events for which there are actual injections used to
