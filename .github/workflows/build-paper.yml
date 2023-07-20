@@ -25,3 +25,11 @@ jobs:
         with:
           name: Bump10MSun
           path: paper/Bump10MSun.pdf
+      - name: Push PDF
+        run: |
+            git checkout --orphan ${GITHUB_REF##*/}-pdf
+            git rm -rf .
+            cd paper
+            git add -f Bump10MSun.pdf
+            git -c user.name="paper-builder" -c user.email="paper-builder" commit -m "Update PDF"
+            git push -q -f https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} ${GITHUB_REF##*/}-pdf
