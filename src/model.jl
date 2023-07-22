@@ -1,8 +1,14 @@
-"""The minimum mass considered."""
+"""The minimum mass for plotting."""
 const mlow = 3.0
 
-"""The maximum mass considered."""
+"""The maximum mass for plotting."""
 const mhigh = 20.0
+
+"""The minimum chirp mass considered in this study."""
+const mclow = 2.612
+
+"""The maximum chirp mass considered in this study."""
+const mchigh = 17.41
 
 """The reference redshift, at which rates are evaluated."""
 const zref = 0.0
@@ -21,54 +27,51 @@ struct PowerLawGaussian <: MassFunction end
 struct GaussianPairing <: PairingFunction end
 struct PowerLawPairing <: PairingFunction end
 
+function isselected(m1, m2)
+  mc = chirp_mass(m1, m2)
+  mclow < mc && mc < mchigh && mlow < m2
+end
+
 # It is convenient that all of these different models are distinguished by their number of arguments.
 function _fm(::BrokenPowerLaw, m, a1, a2, mb)
-  x = m/mb
-  if m < mlow || m > mhigh
-      -Inf
-  elseif m < mb
-      a1*log(x)
-  else
-      a2*log(x)
-  end
+x = m/mb
+if  m < mb
+    a1*log(x)
+else
+    a2*log(x)
+end
 end
 
 function _fm(::TwoBrokenPowerLaw, m, a1, a2, a3, mb12, mb23)
-  if m < mlow || m > mhigh
-      -Inf
-  elseif m < mb12
-      a1*log(m/mb12)
-  elseif m < mb23
-      a2*log(m/mb12)
-  else
-      a3*log(m/mb12) + (a2-a3)*log(mb23/mb12)
-  end
+if m < mb12
+    a1*log(m/mb12)
+elseif m < mb23
+    a2*log(m/mb12)
+else
+    a3*log(m/mb12) + (a2-a3)*log(mb23/mb12)
+end
 end
 
 function _fm(::PowerLawGaussian, m, a1, a2, mu, sigma, fg)
-  if m < mlow || m > mhigh
-    -Inf
-  else
-    log_fg = log(fg)
-    log_fpl = log1p(-fg)
-    if m < mu
-      logaddexp(log_fpl + a1*log(m/mu), log_fg - 0.5*square((m-mu)/sigma))
-    else
-      logaddexp(log_fpl + a2*log(m/mu), log_fg - 0.5*square((m-mu)/sigma))
-    end
-  end
+log_fg = log(fg)
+log_fpl = log1p(-fg)
+if m < mu
+  logaddexp(log_fpl + a1*log(m/mu), log_fg - 0.5*square((m-mu)/sigma))
+else
+  logaddexp(log_fpl + a2*log(m/mu), log_fg - 0.5*square((m-mu)/sigma))
+end
 end
 
 function _pf(::GaussianPairing, q, mu, sigma)
-  -0.5*square((q-mu)/sigma) + 0.5*square(1-mu)/sigma
+-0.5*square((q-mu)/sigma) + 0.5*square(1-mu)/sigma
 end
 
 function _pf(::PowerLawPairing, q, beta)
-  beta*log(q)
+beta*log(q)
 end
 
 """
-    make_log_dN(BrokenPowerLaw(), GaussianPairing(), a1, a2, mb, mu_q, sigma_q)
+  make_log_dN(BrokenPowerLaw(), GaussianPairing(), a1, a2, mb, mu_q, sigma_q)
 
 Produces a function that computes `(m1, m2) -> log_dNdm1dm2` for the
 single-break power law population model.
@@ -91,15 +94,19 @@ returned is normalized so that ``R`` measures the volumetric merger rate per
 natural log mass squared at `m1 = m2 = m_b`.
 """
 function make_log_dN(mf::BrokenPowerLaw, pf::GaussianPairing, a1, a2, mb, mu_q, sigma_q)
-    function log_dN(m1, m2)
-        q = m2/m1
-        _fm(mf, m1, a1, a2, mb) + _fm(mf, m2, a1, a2, mb) - log(m1) - log(m2) + _pf(pf, q, mu_q, sigma_q)
+function log_dN(m1, m2)
+    if isselected(m1, m2)
+      q = m2/m1
+      _fm(mf, m1, a1, a2, mb) + _fm(mf, m2, a1, a2, mb) - log(m1) - log(m2) + _pf(pf, q, mu_q, sigma_q)
+    else
+      -Inf
     end
-    log_dN
+end
+log_dN
 end
 
 """
-    make_log_dN(BrokenPowerLaw(), PowerLawPairing(), a1, a2, mb, beta)
+  make_log_dN(BrokenPowerLaw(), PowerLawPairing(), a1, a2, mb, beta)
 
 Produces a function that computes `(m1, m2) -> log_dNdm1dm2` for the
 single-break power law population model.
@@ -122,15 +129,19 @@ that ``R`` measures the volumetric merger rate per natural log mass squared at
 `m1 = m2 = m_b`.
 """
 function make_log_dN(mf::BrokenPowerLaw, pf::PowerLawPairing, a1, a2, mb, beta)
-    function log_dN(m1, m2)
-        q = m2/m1
-        _fm(mf, m1, a1, a2, mb) + _fm(mf, m2, a1, a2, mb) - log(m1) - log(m2) + _pf(pf, q, beta)
+  function log_dN(m1, m2)
+    if isselected(m1, m2)
+      q = m2/m1
+      _fm(mf, m1, a1, a2, mb) + _fm(mf, m2, a1, a2, mb) - log(m1) - log(m2) + _pf(pf, q, beta)
+    else
+      -Inf
     end
-    log_dN
+  end
+  log_dN
 end
 
 """
-    make_log_dN(TwoBrokenPowerLaw(), GaussianPairing(), a1, a2, a3, mb12, mb23, mu_q, sigma_q)
+  make_log_dN(TwoBrokenPowerLaw(), GaussianPairing(), a1, a2, a3, mb12, mb23, mu_q, sigma_q)
 
 Produces a function that computes `(m1, m2) -> log_dNdm1dm2` for the two-break
 power law population model.
@@ -154,15 +165,19 @@ returned is normalized so that ``R`` measures the volumetric merger rate per
 natural log mass squared at `m1 = m2 = mb12`.
 """
 function make_log_dN(mf::TwoBrokenPowerLaw, pf::GaussianPairing, a1, a2, a3, mb12, mb23, mu_q, sigma_q)
-    function log_dN(m1, m2)
-        q = m2/m1
-        _fm(mf, m1, a1, a2, a3, mb12, mb23) + _fm(mf, m2, a1, a2, a3, mb12, mb23) - log(m1) - log(m2) + _pf(pf, q, mu_q, sigma_q)
+  function log_dN(m1, m2)
+    if isselected(m1, m2)
+      q = m2/m1
+      _fm(mf, m1, a1, a2, a3, mb12, mb23) + _fm(mf, m2, a1, a2, a3, mb12, mb23) - log(m1) - log(m2) + _pf(pf, q, mu_q, sigma_q)
+    else
+      -Inf
     end
-    log_dN
+  end
+  log_dN
 end
 
 """
-    make_log_dN(TwoBrokenPowerLaw(), PowerLawPairing(), a1, a2, a3, mb12, mb23, beta)
+  make_log_dN(TwoBrokenPowerLaw(), PowerLawPairing(), a1, a2, a3, mb12, mb23, beta)
 
 Produces a function that computes `(m1, m2) -> log_dNdm1dm2` for the two-break
 power law population model.
@@ -186,15 +201,19 @@ is the "common" black hole mass function, and a power-law pairing function in
 m2 = mb12`.
 """
 function make_log_dN(mf::TwoBrokenPowerLaw, pf::PowerLawPairing, a1, a2, a3, mb12, mb23, beta)
-    function log_dN(m1, m2)
-        q = m2/m1
-        _fm(mf, m1, a1, a2, a3, mb12, mb23) + _fm(mf, m2, a1, a2, a3, mb12, mb23) - log(m1) - log(m2) + _pf(pf, q, beta)
+  function log_dN(m1, m2)
+    if isselected(m1, m2)
+      q = m2/m1
+      _fm(mf, m1, a1, a2, a3, mb12, mb23) + _fm(mf, m2, a1, a2, a3, mb12, mb23) - log(m1) - log(m2) + _pf(pf, q, beta)
+    else
+      -Inf
     end
-    log_dN
+  end
+  log_dN
 end
 
 """
-    make_log_dN(PowerLawGaussian(), PowerLawPairing(), alpha, mu, sigma, fg, beta)
+  make_log_dN(PowerLawGaussian(), PowerLawPairing(), alpha, mu, sigma, fg, beta)
 
 Produces a function that computes `(m1, m2) -> log_dNdm1dm2` for the power-law
 plus Gaussian population model.
@@ -210,62 +229,66 @@ f_m \\left( m \\right) = f_g \\exp\\left(-\\frac{1}{2} \\left(\\frac{m-\\mu}{\\s
 is a sum of a power-law "continuium" and a Gaussian "peak."  As written, `R` is the merger rate per log mass squared at `m1 = m2 = mu`.
 """
 function make_log_dN(mf::PowerLawGaussian, pf::PowerLawPairing, a1, a2, mu, sigma, fg, beta)
-  function log_dN(m1, m2)
+function log_dN(m1, m2)
+  if isselected(m1, m2)
     q = m2/m1
     _fm(mf, m1, a1, a2, mu, sigma, fg) + _fm(mf, m2, a1, a2, mu, sigma, fg) - log(m1) - log(m2) + _pf(pf, q, beta)
+  else
+    -Inf
   end
-  log_dN
+end
+log_dN
 end
 
 """
-    make_dNdm1(mf_type, pair_type, args...)
+  make_dNdm1(mf_type, pair_type, args...)
 
 Returns a function that computes the marginal density (unnormalized) in `m1`.
 Mass function and pairing function types and arguments are passed to ``make_log_dN``.  
 """
 function make_dNdm1(mf_type, pair_type, args...)
-    log_dN = make_log_dN(mf_type, pair_type, args...)
-    make_dNdm1(log_dN)
+  log_dN = make_log_dN(mf_type, pair_type, args...)
+  make_dNdm1(log_dN)
 end
 function make_dNdm1(log_dN)
-    m1 -> begin
-        if m1 <= mlow
-            zero(m1)
-        elseif m1 > mhigh
-            zero(m1)
-        else
-            n = Int(round(100*(log(m1)-log(mlow)))) + 2
-            ms = exp.(range(log(mlow), stop=log(m1), length=n))
-            dN = exp.(map(m2->log_dN(m1,m2), ms))
-            trapz(ms, dN)
-        end
-    end
+  m1 -> begin
+      if m1 <= mlow
+          zero(m1)
+      elseif m1 > mhigh
+          zero(m1)
+      else
+          n = Int(round(100*(log(m1)-log(mlow)))) + 2
+          ms = exp.(range(log(mlow), stop=log(m1), length=n))
+          dN = exp.(map(m2->log_dN(m1,m2), ms))
+          trapz(ms, dN)
+      end
+  end
 end
 
 """
-    make_dNdm2(mf_type, pair_type, args...)
+  make_dNdm2(mf_type, pair_type, args...)
 
 Returns a function that computes the marginal density (unnormalized) in `m2`;
 mass function and pairing function types and ``args...`` are passed to
 ``make_log_dN``.
 """
 function make_dNdm2(mf_type, pair_type, args...)
-    log_dN = make_log_dN(mf_type, pair_type, args...)
-    make_dNdm2(log_dN)
+  log_dN = make_log_dN(mf_type, pair_type, args...)
+  make_dNdm2(log_dN)
 end
 function make_dNdm2(log_dN)
-    m2 -> begin
-        if m2 < mlow
-            zero(m2)
-        elseif m2 > mhigh
-            zero(m2)
-        else
-            n = Int(round(100*(log(mhigh) - log(m2)))) + 2
-            ms = exp.(range(log(m2), stop=log(mhigh), length=n))
-            dN = exp.(map(m1->log_dN(m1, m2), ms))
-            trapz(ms, dN)
-        end
-    end
+  m2 -> begin
+      if m2 < mlow
+          zero(m2)
+      elseif m2 > mhigh
+          zero(m2)
+      else
+          n = Int(round(100*(log(mhigh) - log(m2)))) + 2
+          ms = exp.(range(log(m2), stop=log(mhigh), length=n))
+          dN = exp.(map(m1->log_dN(m1, m2), ms))
+          trapz(ms, dN)
+      end
+  end
 end
 
 """
@@ -274,24 +297,24 @@ Mass function type, pairing function type, and arguments are passed to
 `make_log_dN`.
 """
 function make_dNdq(mf_type, pf_type, args...)
-    log_dN = make_log_dN(mf_type, pf_type, args...)
-    make_dNdq(log_dN)
+  log_dN = make_log_dN(mf_type, pf_type, args...)
+  make_dNdq(log_dN)
 end
 function make_dNdq(log_dN)
-    q -> begin
-        if q < mlow/mhigh
-            zero(q)
-        elseif q > 1
-            zero(q)
-        else
-            ml = mlow/q
-            mh = mhigh
-            n = Int(round(100*(log(mh)-log(ml)))) + 2
-            ms = exp.(range(log(ml), stop=log(mh), length=n))
-            dN = exp.(map(m1->log_dN(m1, q*m1) + log(m1), ms))
-            trapz(ms, dN)
-        end
-    end
+  q -> begin
+      if q < mlow/mhigh
+          zero(q)
+      elseif q > 1
+          zero(q)
+      else
+          ml = mlow/q
+          mh = mhigh
+          n = Int(round(100*(log(mh)-log(ml)))) + 2
+          ms = exp.(range(log(ml), stop=log(mh), length=n))
+          dN = exp.(map(m1->log_dN(m1, q*m1) + log(m1), ms))
+          trapz(ms, dN)
+      end
+  end
 end
 
 """
@@ -300,20 +323,20 @@ above; with two slopes and one break, the single broken power law; with three
 slopes and two breaks, the double-broken power law.
 """
 function make_dNdm(mf_type, args...)
-  m -> begin
-    exp(_fm(mf_type, m, args...))/m
-  end
+m -> begin
+  exp(_fm(mf_type, m, args...))/m
+end
 end
 
 """
 Returns the "pairing probability", the function ``g(q)``.
 """
 function make_pairing_prob(pf_type, args...)
-    q -> exp(_pf(pf_type, q, args...))
+  q -> exp(_pf(pf_type, q, args...))
 end
 
 """
-    model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
 
 Implements the mass model fitting, given a log density function `log_dN` and
 observed masses (drawn from a prior with weight `log_wts`) and detected
@@ -323,15 +346,15 @@ injection masses with (normalized) draw distribution `log_pdraw`.
 
 - `log_dN``: log density function.  Called as `log_dN(m1, m2)`.
 - `m1s``: observed primary masses, nested iterables of lengeth `n_observations`,
-  then `n_samples` within each observation.
+then `n_samples` within each observation.
 - `m2s``: observed secondary masses.
 - `log_wts`: log of the prior weight assigned to each observed mass pair.
 - `m1s_sel``: primary masses from detected injections, iterable of length
-  `n_detected`.
+`n_detected`.
 - `m2s_sel`: secondary masses from detected injections.
 - `log_pdraw`: log of the normalized draw distribution for the injections.
 - `Ndraw`: the total number of injections drawn to produce the detections in
-  `m1s_sel`, `m2s_sel`.
+`m1s_sel`, `m2s_sel`.
 
 # Returns
 
@@ -340,108 +363,108 @@ injection masses with (normalized) draw distribution `log_pdraw`.
 After calling `model_body(...)`, you should add the log-likelihood and
 log-normalization terms to the density via
 
-    Turing.@addlogprob! log_likelihood_sum
-    Turing.@addlogprob! log_normalization_sum
+  Turing.@addlogprob! log_likelihood_sum
+  Turing.@addlogprob! log_normalization_sum
 
 The generated quantities include 
 
 - `R`: The merger rate density scaling parameter (overall merger rate density is
-  `R*exp(log_dN(...))`).
+`R*exp(log_dN(...))`).
 - `Neff_sel`: The number of effective samples in the importance weighted
-  integral of the selection function (the normalization); see [Farr
-  (2019)](https://ui.adsabs.harvard.edu/abs/2019RNAAS...3...66F/abstract) for
-  definition.  This should be at absolute minimum ``4 N_\\mathrm{obs}`` (i.e. 4
-  times the catalog size), preferably much larger.
+integral of the selection function (the normalization); see [Farr
+(2019)](https://ui.adsabs.harvard.edu/abs/2019RNAAS...3...66F/abstract) for
+definition.  This should be at absolute minimum ``4 N_\\mathrm{obs}`` (i.e. 4
+times the catalog size), preferably much larger.
 - `Neff_samps`: An array giving the number of effective samples in the
-  importance-weighted likelihood integral for each observation; these should all
-  be ``\\gg 1`` (3-4 is good, 10 is better) or else the likelihood integral is
-  not converged.
+importance-weighted likelihood integral for each observation; these should all
+be ``\\gg 1`` (3-4 is good, 10 is better) or else the likelihood integral is
+not converged.
 - `m1s_popwt`: An array giving a population-weighted draw from the primary mass
-  samples for each event.
+samples for each event.
 - `m2s_popwt`: Same, for secondary masses.
 - `m1_draw`: A draw from the primary masses of detected injections weighted by
-  the population (these draws can be used to predict the *observed* population
-  implied by the model).
+the population (these draws can be used to predict the *observed* population
+implied by the model).
 - `m2_draw`: Same, but secondary masses.
 
 You should return the generated quantities from the turing model, so the full
 use of this function looks like 
 
-    @model function my_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw, ...)
-      # Set up parameter priors, etc.
-      my_parameter_1 ~ Normal(...)
-      # and so on
+  @model function my_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw, ...)
+    # Set up parameter priors, etc.
+    my_parameter_1 ~ Normal(...)
+    # and so on
 
-      # Compute any derived quantities you need.
-      derived_quantity = my_parameter_1^2 + ...
+    # Compute any derived quantities you need.
+    derived_quantity = my_parameter_1^2 + ...
 
-      # Obtain the log-rate-density from the model:
-      log_dN = model_log_dN(my_parameter_1, derived_quantity, ...)
+    # Obtain the log-rate-density from the model:
+    log_dN = model_log_dN(my_parameter_1, derived_quantity, ...)
 
-      logl, log_norm, genq = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
-      Turing.@addlogprob! logl
-      Turing.@addlogprob! log_norm
+    logl, log_norm, genq = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+    Turing.@addlogprob! logl
+    Turing.@addlogprob! log_norm
 
-      # Compute anything eles you need, maybe some more generated quantities
-      additional_genq = (derived_quatity = derived_quantity, ...)
+    # Compute anything eles you need, maybe some more generated quantities
+    additional_genq = (derived_quatity = derived_quantity, ...)
 
-      # Return generated quantities 
-      return merge(genq, additional_genq) # or just return genq if you have no additional generated quantities
+    # Return generated quantities 
+    return merge(genq, additional_genq) # or just return genq if you have no additional generated quantities
 """
 function model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
-    Nobs = length(m1s)
+  Nobs = length(m1s)
 
-    log_wts = map(m1s, m2s, log_wts) do mm1, mm2, log_wwt
-        map(mm1, mm2, log_wwt) do m1, m2, log_wt
-            log_dN(m1, m2) - log_wt
-        end
-    end
+  log_wts = map(m1s, m2s, log_wts) do mm1, mm2, log_wwt
+      map(mm1, mm2, log_wwt) do m1, m2, log_wt
+          log_dN(m1, m2) - log_wt
+      end
+  end
 
-    Neff_samps = map(log_wts) do lws
-        exp(2*logsumexp(lws) - logsumexp(2 .* lws))
-    end
+  Neff_samps = map(log_wts) do lws
+      exp(2*logsumexp(lws) - logsumexp(2 .* lws))
+  end
 
-    log_likes = map(log_wts) do lw
-        logsumexp(lw) - log(length(lw))
-    end
+  log_likes = map(log_wts) do lw
+      logsumexp(lw) - log(length(lw))
+  end
 
-    log_like_sum = sum(log_likes)
+  log_like_sum = sum(log_likes)
 
-    log_wts_sel = map(m1s_sel, m2s_sel, log_pdraw) do m1, m2, logp
-        log_dN(m1, m2) - logp
-    end
-    log_mu = logsumexp(log_wts_sel) - log(Ndraw)
-    log_s2 = logsubexp(logsumexp(2 .* log_wts_sel) - 2.0*log(Ndraw), 2*log_mu - log(Ndraw))
-    Neff_sel = exp(2*log_mu - log_s2)
+  log_wts_sel = map(m1s_sel, m2s_sel, log_pdraw) do m1, m2, logp
+      log_dN(m1, m2) - logp
+  end
+  log_mu = logsumexp(log_wts_sel) - log(Ndraw)
+  log_s2 = logsubexp(logsumexp(2 .* log_wts_sel) - 2.0*log(Ndraw), 2*log_mu - log(Ndraw))
+  Neff_sel = exp(2*log_mu - log_s2)
 
-    log_norm_sum = -Nobs*log_mu
+  log_norm_sum = -Nobs*log_mu
 
-    mu_R = Nobs/exp(log_mu)
-    sigma_R = sqrt(Nobs) / exp(log_mu)
+  mu_R = Nobs/exp(log_mu)
+  sigma_R = sqrt(Nobs) / exp(log_mu)
 
-    R = rand(Normal(mu_R, sigma_R))
-    
-    m1_m2_draw = map(m1s, m2s, log_wts) do mm1, mm2, log_wwt
-        i = rand(Categorical(exp.(log_wwt .- logsumexp(log_wwt))))
-        (mm1[i], mm2[i])
-    end
+  R = rand(Normal(mu_R, sigma_R))
+  
+  m1_m2_draw = map(m1s, m2s, log_wts) do mm1, mm2, log_wwt
+      i = rand(Categorical(exp.(log_wwt .- logsumexp(log_wwt))))
+      (mm1[i], mm2[i])
+  end
 
-    m1s_draw = map(m1_m2_draw) do m1_m2
-        m1_m2[1]
-    end
-    m2s_draw = map(m1_m2_draw) do m1_m2
-        m1_m2[2]
-    end
+  m1s_draw = map(m1_m2_draw) do m1_m2
+      m1_m2[1]
+  end
+  m2s_draw = map(m1_m2_draw) do m1_m2
+      m1_m2[2]
+  end
 
-    i_sel = rand(Categorical(exp.(log_wts_sel .- logsumexp(log_wts_sel))))
-    m1_draw_sel = m1s_sel[i_sel]
-    m2_draw_sel = m2s_sel[i_sel]
-    
-    return log_like_sum, log_norm_sum, (R = R, Neff_sel = Neff_sel, Neff_samps = Neff_samps, m1s_popwt = m1s_draw, m2s_popwt = m2s_draw, m1_draw=m1_draw_sel, m2_draw=m2_draw_sel)
+  i_sel = rand(Categorical(exp.(log_wts_sel .- logsumexp(log_wts_sel))))
+  m1_draw_sel = m1s_sel[i_sel]
+  m2_draw_sel = m2s_sel[i_sel]
+  
+  return log_like_sum, log_norm_sum, (R = R, Neff_sel = Neff_sel, Neff_samps = Neff_samps, m1s_popwt = m1s_draw, m2s_popwt = m2s_draw, m1_draw=m1_draw_sel, m2_draw=m2_draw_sel)
 end
 
 """
-    broken_pl_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  broken_pl_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
 
 Returns a Turing model for our broken power law mass function with a Gaussian
 pairing function.
@@ -449,15 +472,15 @@ pairing function.
 # Arguments
 
 - `m1s`: An iterable containing iterables of the posterior samples for the
-  source-frame primary mass for our observations.
+source-frame primary mass for our observations.
 - `m2s`: Same, but for secondary mass.
 - `log_wts`: Iterable with iterables of the log of the prior weight assigned to
-  each sample.
+each sample.
 - `m1s_sel`: Samples of primary mass from the detected injections used to
-  estimate detector sensitivity.
+estimate detector sensitivity.
 - `m2s_sel`: Secondary mass.
 - `log_pdraw`: The log of the (normalized) density from which the injections
-  were drawn.
+were drawn.
 - `Ndraw`: The number of injections drawn.
 
 # Parameters
@@ -468,36 +491,36 @@ pairing function.
 - `mu_q`: The peak of the pairing function Gaussian.
 - `sigma_q`: The width of the pairing function Gaussian.
 - `R`: (generated) The volumetric merger rate per natural log mass squared at
-  `m1 = m2 = mb`.
+`m1 = m2 = mb`.
 - `Neff_sel`: (generated) The effective number of samples (see [Farr
-  (2019)](https://iopscience.iop.org/article/10.3847/2515-5172/ab1d5f)) in the
-  Monte-Carlo selection integral.
+(2019)](https://iopscience.iop.org/article/10.3847/2515-5172/ab1d5f)) in the
+Monte-Carlo selection integral.
 - `Neff_samps`: (generated) The effective number of samples in the posterior
-  samples after re-weighting to the current population model.
+samples after re-weighting to the current population model.
 - `m1s_popwt`: (generated) The primary mass samples drawn from the population
-  model.
+model.
 - `m2s_popwt`: (generated) The secondary mass samples drawn from the population
-  model.
+model.
 - `m1_draw`: (generated) A draw of primary mass from the detected population.
 - `m2_draw`: (generated) A draw of secondary mass from the detected population.
 """
 @model function broken_pl_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
-    a1 ~ Uniform(0, 15)
-    a2 ~ Uniform(-15, 0)
-    mb ~ Uniform(sqrt(30), sqrt(200)) # Peaks somewhere around 10.
-    mu_q ~ Uniform(0.2, 1.0)
-    sigma_q ~ Uniform(0.1, 2)
+  a1 ~ Uniform(0, 15)
+  a2 ~ Uniform(-15, 0)
+  mb ~ Uniform(sqrt(30), sqrt(200)) # Peaks somewhere around 10.
+  mu_q ~ Uniform(0.2, 1.0)
+  sigma_q ~ Uniform(0.1, 2)
 
-    log_dN = make_log_dN(BrokenPowerLaw(), GaussianPairing(), a1, a2, mb, mu_q, sigma_q)
+  log_dN = make_log_dN(BrokenPowerLaw(), GaussianPairing(), a1, a2, mb, mu_q, sigma_q)
 
-    logl_sum, lognorm_sum, generated_quantities = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
-    Turing.@addlogprob! logl_sum
-    Turing.@addlogprob! lognorm_sum
-    generated_quantities
+  logl_sum, lognorm_sum, generated_quantities = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  Turing.@addlogprob! logl_sum
+  Turing.@addlogprob! lognorm_sum
+  generated_quantities
 end
 
 """
-    broken_pl_plp_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  broken_pl_plp_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
 
 Returns a Turing model for our broken power law mass function, with power law
 pairing function.
@@ -505,15 +528,15 @@ pairing function.
 # Arguments
 
 - `m1s`: An iterable containing iterables of the posterior samples for the
-  source-frame primary mass for our observations.
+source-frame primary mass for our observations.
 - `m2s`: Same, but for secondary mass.
 - `log_wts`: Iterable with iterables of the log of the prior weight assigned to
-  each sample.
+each sample.
 - `m1s_sel`: Samples of primary mass from the detected injections used to
-  estimate detector sensitivity.
+estimate detector sensitivity.
 - `m2s_sel`: Secondary mass.
 - `log_pdraw`: The log of the (normalized) density from which the injections
-  were drawn.
+were drawn.
 - `Ndraw`: The number of injections drawn.
 
 # Parameters
@@ -523,36 +546,36 @@ pairing function.
 - `mb`: The break mass.
 - `beta`: The pairing power law exponent.
 - `R`: (generated) The volumetric merger rate per natural log mass squared at
-  `m1 = m2 = mb`.
+`m1 = m2 = mb`.
 - `Neff_sel`: (generated) The effective number of samples (see [Farr
-  (2019)](https://iopscience.iop.org/article/10.3847/2515-5172/ab1d5f)) in the
-  Monte-Carlo selection integral.
+(2019)](https://iopscience.iop.org/article/10.3847/2515-5172/ab1d5f)) in the
+Monte-Carlo selection integral.
 - `Neff_samps`: (generated) The effective number of samples in the posterior
-  samples after re-weighting to the current population model.
+samples after re-weighting to the current population model.
 - `m1s_popwt`: (generated) The primary mass samples drawn from the population
-  model.
+model.
 - `m2s_popwt`: (generated) The secondary mass samples drawn from the population
-  model.
+model.
 - `m1_draw`: (generated) A draw of primary mass from the detected population.
 - `m2_draw`: (generated) A draw of secondary mass from the detected population.
 """
 @model function broken_pl_plp_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
-    a1 ~ Uniform(0, 15)
-    a2 ~ Uniform(-15, 0)
-    mb ~ Uniform(sqrt(30), sqrt(200)) # Peaks somewhere around 10.
+  a1 ~ Uniform(0, 15)
+  a2 ~ Uniform(-15, 0)
+  mb ~ Uniform(sqrt(30), sqrt(200)) # Peaks somewhere around 10.
 
-    beta ~ Uniform(-5, 5)
+  beta ~ Uniform(-5, 5)
 
-    log_dN = make_log_dN(BrokenPowerLaw(), PowerLawPairing(), a1, a2, mb, beta)
+  log_dN = make_log_dN(BrokenPowerLaw(), PowerLawPairing(), a1, a2, mb, beta)
 
-    logl_sum, lognorm_sum, generated_quantities = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
-    Turing.@addlogprob! logl_sum
-    Turing.@addlogprob! lognorm_sum
-    generated_quantities
+  logl_sum, lognorm_sum, generated_quantities = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  Turing.@addlogprob! logl_sum
+  Turing.@addlogprob! lognorm_sum
+  generated_quantities
 end
 
 """
-    two_broken_pl_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  two_broken_pl_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
 
 Returns a Turing model for our broken power law mass function with a Gaussian
 pairing function.
@@ -560,15 +583,15 @@ pairing function.
 # Arguments
 
 - `m1s`: An iterable containing iterables of the posterior samples for the
-  source-frame primary mass for our observations.
+source-frame primary mass for our observations.
 - `m2s`: Same, but for secondary mass.
 - `log_wts`: Iterable with iterables of the log of the prior weight assigned to
-  each sample.
+each sample.
 - `m1s_sel`: Samples of primary mass from the detected injections used to
-  estimate detector sensitivity.
+estimate detector sensitivity.
 - `m2s_sel`: Secondary mass.
 - `log_pdraw`: The log of the (normalized) density from which the injections
-  were drawn.
+were drawn.
 - `Ndraw`: The number of injections drawn.
 
 # Parameters
@@ -581,44 +604,44 @@ pairing function.
 - `mu_q`: The peak of the pairing function Gaussian.
 - `sigma_q`: The width of the pairing function Gaussian.
 - `R`: (generated) The volumetric merger rate per natural log mass squared at
-  `m1 = m2 = mb`.
+`m1 = m2 = mb`.
 - `Neff_sel`: (generated) The effective number of samples (see [Farr
-  (2019)](https://iopscience.iop.org/article/10.3847/2515-5172/ab1d5f)) in the
-  Monte-Carlo selection integral.
+(2019)](https://iopscience.iop.org/article/10.3847/2515-5172/ab1d5f)) in the
+Monte-Carlo selection integral.
 - `Neff_samps`: (generated) The effective number of samples in the posterior
-  samples after re-weighting to the current population model.
+samples after re-weighting to the current population model.
 - `m1s_popwt`: (generated) The primary mass samples drawn from the population
-  model.
+model.
 - `m2s_popwt`: (generated) The secondary mass samples drawn from the population
-  model.
+model.
 - `m1_draw`: (generated) A draw of primary mass from the detected population.
 - `m2_draw`: (generated) A draw of secondary mass from the detected population.
 """
 @model function two_broken_pl_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
-    a1 ~ Uniform(-10, 10)
-    a2 ~ Uniform(-10, 10)
-    a3 ~ Uniform(-10, 10)
+  a1 ~ Uniform(-10, 10)
+  a2 ~ Uniform(-10, 10)
+  a3 ~ Uniform(-10, 10)
 
-    # Flat in mb12-mb23 space.
-    x12 ~ Uniform(0,1)
-    x23 ~ Uniform(0,1)
-    mb12 = mlow+1 + (mhigh-1 - (mlow+1))*x12
-    mb23 = mb12 + (mhigh-1 - mb12)*x23
-    Turing.@addlogprob! log((mhigh-1) - (mlow+1)) + log(mhigh-1 - mb12)
+  # Flat in mb12-mb23 space.
+  x12 ~ Uniform(0,1)
+  x23 ~ Uniform(0,1)
+  mb12 = mlow+1 + (mhigh-1 - (mlow+1))*x12
+  mb23 = mb12 + (mhigh-1 - mb12)*x23
+  Turing.@addlogprob! log((mhigh-1) - (mlow+1)) + log(mhigh-1 - mb12)
 
-    mu_q ~ Uniform(0.2, 1.0)
-    sigma_q ~ Uniform(0.1, 2)
+  mu_q ~ Uniform(0.2, 1.0)
+  sigma_q ~ Uniform(0.1, 2)
 
-    log_dN = make_log_dN(TwoBrokenPowerLaw(), GaussianPairing(), a1, a2, a3, mb12, mb23, mu_q, sigma_q)
+  log_dN = make_log_dN(TwoBrokenPowerLaw(), GaussianPairing(), a1, a2, a3, mb12, mb23, mu_q, sigma_q)
 
-    logl_sum, lognorm_sum, generated_quantities = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
-    Turing.@addlogprob! logl_sum
-    Turing.@addlogprob! lognorm_sum
-    merge(generated_quantities, (mb12=mb12, mb23=mb23))
+  logl_sum, lognorm_sum, generated_quantities = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  Turing.@addlogprob! logl_sum
+  Turing.@addlogprob! lognorm_sum
+  merge(generated_quantities, (mb12=mb12, mb23=mb23))
 end
 
 """
-    two_broken_pl_plp_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  two_broken_pl_plp_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
 
 Returns a Turing model for our broken power law mass function with a power law
 pairing function.
@@ -626,15 +649,15 @@ pairing function.
 # Arguments
 
 - `m1s`: An iterable containing iterables of the posterior samples for the
-  source-frame primary mass for our observations.
+source-frame primary mass for our observations.
 - `m2s`: Same, but for secondary mass.
 - `log_wts`: Iterable with iterables of the log of the prior weight assigned to
-  each sample.
+each sample.
 - `m1s_sel`: Samples of primary mass from the detected injections used to
-  estimate detector sensitivity.
+estimate detector sensitivity.
 - `m2s_sel`: Secondary mass.
 - `log_pdraw`: The log of the (normalized) density from which the injections
-  were drawn.
+were drawn.
 - `Ndraw`: The number of injections drawn.
 
 # Parameters
@@ -646,39 +669,39 @@ pairing function.
 - `mb23`: The mid-high break mass.
 - `beta`: The power law index of the pairing function.
 - `R`: (generated) The volumetric merger rate per natural log mass squared at
-  `m1 = m2 = mb`.
+`m1 = m2 = mb`.
 - `Neff_sel`: (generated) The effective number of samples (see [Farr
-  (2019)](https://iopscience.iop.org/article/10.3847/2515-5172/ab1d5f)) in the
-  Monte-Carlo selection integral.
+(2019)](https://iopscience.iop.org/article/10.3847/2515-5172/ab1d5f)) in the
+Monte-Carlo selection integral.
 - `Neff_samps`: (generated) The effective number of samples in the posterior
-  samples after re-weighting to the current population model.
+samples after re-weighting to the current population model.
 - `m1s_popwt`: (generated) The primary mass samples drawn from the population
-  model.
+model.
 - `m2s_popwt`: (generated) The secondary mass samples drawn from the population
-  model.
+model.
 - `m1_draw`: (generated) A draw of primary mass from the detected population.
 - `m2_draw`: (generated) A draw of secondary mass from the detected population.
 """
 @model function two_broken_pl_plp_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
-    a1 ~ Uniform(-10, 10)
-    a2 ~ Uniform(-10, 10)
-    a3 ~ Uniform(-10, 10)
+  a1 ~ Uniform(-10, 10)
+  a2 ~ Uniform(-10, 10)
+  a3 ~ Uniform(-10, 10)
 
-    # Flat in mb12-mb23 space.
-    x12 ~ Uniform(0,1)
-    x23 ~ Uniform(0,1)
-    mb12 = mlow+1 + (mhigh-1 - (mlow+1))*x12
-    mb23 = mb12 + (mhigh-1 - mb12)*x23
-    Turing.@addlogprob! log((mhigh-1) - (mlow+1)) + log(mhigh-1 - mb12)
+  # Flat in mb12-mb23 space.
+  x12 ~ Uniform(0,1)
+  x23 ~ Uniform(0,1)
+  mb12 = mlow+1 + (mhigh-1 - (mlow+1))*x12
+  mb23 = mb12 + (mhigh-1 - mb12)*x23
+  Turing.@addlogprob! log((mhigh-1) - (mlow+1)) + log(mhigh-1 - mb12)
 
-    beta ~ Uniform(-5, 5)
+  beta ~ Uniform(-5, 5)
 
-    log_dN = make_log_dN(TwoBrokenPowerLaw(), PowerLawPairing(), a1, a2, a3, mb12, mb23, beta)
+  log_dN = make_log_dN(TwoBrokenPowerLaw(), PowerLawPairing(), a1, a2, a3, mb12, mb23, beta)
 
-    logl_sum, lognorm_sum, generated_quantities = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
-    Turing.@addlogprob! logl_sum
-    Turing.@addlogprob! lognorm_sum
-    merge(generated_quantities, (mb12=mb12, mb23=mb23))
+  logl_sum, lognorm_sum, generated_quantities = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  Turing.@addlogprob! logl_sum
+  Turing.@addlogprob! lognorm_sum
+  merge(generated_quantities, (mb12=mb12, mb23=mb23))
 end
 
 @model function power_law_plus_gaussian_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)

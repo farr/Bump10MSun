@@ -69,27 +69,19 @@ end
 
 log_dN_default = make_log_dN(BrokenPowerLaw(), GaussianPairing(), 1.0, -1.0, 10.0, 0.7, 0.5)
 
-samps = []
-fnames = []
-for fn in glob("GW*[0-9].h5", "/Users/wfarr/Research/o3a_posterior_samples/all_posterior_samples")
-    h5open(fn, "r") do f
-        push!(samps, read(f, "PublicationSamples/posterior_samples"))
-        push!(fnames, fn)
-    end
-end
-for fn in glob("*GW*_nocosmo.h5", "/Users/wfarr/Research/o3b_data/PE")
-    h5open(fn, "r") do f
-        push!(samps, read(f, "C01:Mixed/posterior_samples"))
-        push!(fnames, fn)
-    end
-end
+sampso3a, fnameso3a, gwnameso3a = load_pe_samples("/Users/wfarr/Research/o3a_posterior_samples/all_posterior_samples", "GW*[0-9].h5", "PublicationSamples/posterior_samples")
+sampso3b, fnameso3b, gwnameso3b = load_pe_samples("/Users/wfarr/Research/o3b_data/PE", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
+
+samps = vcat(sampso3a, sampso3b)
+fnames = vcat(fnameso3a, fnameso3b)
+gwnames = vcat(gwnameso3a, gwnameso3b)
 
 mask = map(samps) do ss
     median([x.mass_2_source for x in ss]) > mlow && median([x.mass_1_source for x in ss]) < mhigh
 end
 narrow_samps = samps[mask]
 narrow_fnames = fnames[mask]
-narrow_gwnames = [String(match(r"^.*(GW[0-9]+[_]*[0-9]*).*$", f)[1]) for f in narrow_fnames]
+narrow_gwnames = gwnames[mask]
 
 open(joinpath(@__DIR__, "..", "chains", "chain" * suffix * "_fnames.txt"), "w") do f
     for n in narrow_fnames

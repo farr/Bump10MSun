@@ -4,6 +4,12 @@
 \newcommand{\cca}{Center for Computational Astrophysics, Flatiron Institute, 162 Fifth Avenue, New York, NY 10010, USA}
 \newcommand{\sbu}{Department of Physics and Astronomy, Stony Brook University, Stony Brook, NY 11794, USA}
 
+% Editing commands
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+
+% Generated macros
+\input{result_macros.tex}
+
 \begin{document}
 \title{Hiding Out at the Low End}
 
@@ -27,16 +33,16 @@
     biases in mass estimation.  A small number of black holes have been observed
     with luminous companions in non-interacting orbits, but as yet the sample is
     too small to assess the existence of a gap, and in any case selection
-    effects in this sample are hard to quantify.  Binary black hole mergers
-    detected from gravitational waves in the GWTC-3 transient catalog furnish a
-    large sample of several tens of low-mass black holes with a well-understood
-    selection function.  Here we analyze the 15 GWTC-3 merger events with black
-    hole masses in $3 \, M_\odot < m_2 < m_1 < 20 \, M_\odot$ in detail to
-    uncover the structure of the low-mass black hole mass function in these
-    systems.  Using several flexible parameterized models for the mass function,
-    we find a sharp peak (width $\lesssim 20\%$) in the mass function at $m =
-    9.47^{+0.52}_{-0.58} \, M_\odot$, associated with merger rates $m_1 m_2
-    \mathrm{d} N / \mathrm{d} m_1 \mathrm{d} m_2 \mathrm{d} V \mathrm{d} t =
+    effects in this sample are hard to quantify \todo{Check this!}.  Binary
+    black hole mergers detected from gravitational waves in the GWTC-3 transient
+    catalog furnish a large sample of several tens of low-mass black holes with
+    a well-understood selection function.  Here we analyze the 15 GWTC-3 merger
+    events with black hole masses in $3 \, M_\odot < m_2 < m_1 < 20 \, M_\odot$
+    in detail to uncover the structure of the low-mass black hole mass function
+    in these systems.  Using several flexible parameterized models for the mass
+    function, we find a sharp peak (width $\lesssim 20\%$) in the mass function
+    at $m = 9.47^{+0.52}_{-0.58} \, M_\odot$, associated with merger rates $m_1
+    m_2 \mathrm{d} N / \mathrm{d} m_1 \mathrm{d} m_2 \mathrm{d} V \mathrm{d} t =
     270^{+270}_{-150} \, \mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}$.  The mass
     function falls by at least an order of magnitude both below and above this
     peak.  Toward the lowest masses, the mass function may or may not flatten;
@@ -47,11 +53,14 @@
     distinguish these possibilities.  Toward higher masses, the mass function
     declines to our upper limit $m = 20 \, M_\odot$ steeply, with power law
     slopes $\mathrm{d} N / \mathrm{d} m \sim m^{-\alpha}$, $\alpha =
-    -4.9^{+3.1}_{-3.3}$.  We find no evidence for or against a secondary,
-    sharply-peaked population of black holes around $m \simeq 9 \, M_\odot$ as
-    has been suggested by several models of stellar evolution.
+    -4.9^{+3.1}_{-3.3}$.  The presence of a peak at $m \sim 9 \, M_\odot$ is
+    suggested by several models of stellar evolution.
 \end{abstract}
 
 \section{Introduction}
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{figures/m1-m2-contour.pdf}
+\end{figure}
 
 \end{document}
