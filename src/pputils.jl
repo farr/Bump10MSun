@@ -38,10 +38,10 @@ function result_macro(mname, samples; digits=1, q=0.68)
         hr = round(h-m, digits=digits)
         lr = round(m-l, digits=digits)
     end
-    "\\newcommand{$(mname)}{\\ensuremath{$(mr)^{+$(hr)}_{-$(lr)}}}"
+    "\\newcommand{$(mname)}{\\ensuremath{$(mr)^{+$(hr)}_{-$(lr)}}}\n"
 end
 function result_macro(mname, units, samples; digits=1, q=0.68)
-    result_macro(mname, samples; digits=digits, q=q) * "\n\\newcommand{$(mname)units}{\\ensuremath{$(mname) \\, $(units)}}"
+    result_macro(mname, samples; digits=digits, q=q) * "\\newcommand{$(mname)units}{\\ensuremath{$(mname) \\, $(units)}}\n"
 end
 
 """Map from model to suffix for chain files"""
