@@ -97,3 +97,26 @@ function distribution_quantile(f, xs, q)
     cfm .= cfm ./ cfm[end]
     linear_interpolation(cfm, xs)(q)
 end
+
+"""
+    bisect(f, xl, xh)
+
+Return a solution to `f(x) = 0` between `xl` and `xh` using the bisection method.
+"""
+function bisect(f, xl, xh)
+    bisect_loop(f, f(xl), f(xh), xl, xh)
+end
+function bisect_loop(f, fl, fh, xl, xh)
+    if xh - xl < 1e-8
+        (xh+xl)/2
+    else
+        xm = (xh+xl)/2
+        fm = f(xm)
+
+        if fl*fm < 0
+            bisect_loop(f, fl, fm, xl, xm)
+        else
+            bisect_loop(f, fm, fh, xm, xh)
+        end
+    end
+end

@@ -36,6 +36,7 @@ export suffix_map, label_map, var_name_map
 export mf_label_map, mf_var_name_map
 export pf_label_map, pf_var_name_map
 export distribution_quantile
+export bisect
 
 include("weights.jl")
 export li_prior_wt, md_sfr, md_sfr_zwt, read_selection
