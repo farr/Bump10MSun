@@ -88,12 +88,17 @@ label_map = Dict(
 
 """
     distribution_quantile(f, xs, q)
+    distribution_quantile(xs, ys, q)
 
-Return an estimate of the `x` that corresponds to the `q` quantile of the distribution `f(x)`.
+Return an estimate of the `x` that corresponds to the `q` quantile of the
+distribution `f(x)` or `ys`.
 """
-function distribution_quantile(f, xs, q)
+function distribution_quantile(f::Function, xs::AbstractVector, q::Real)
     fm = f.(xs)
-    cfm = cumtrapz(xs, fm)
+    distribution_quantile(xs, fm, q)
+end
+function distribution_quantile(xs::AbstractVector, ys::AbstractVector, q::Real)
+    cfm = cumtrapz(xs, ys)
     cfm .= cfm ./ cfm[end]
     linear_interpolation(cfm, xs)(q)
 end
