@@ -26,7 +26,7 @@ s = ArgParseSettings()
         arg_type = Int
     "--nsel"
         help = "Number of detected injections to use to estimate the selection normalization"
-        default = 4096
+        default = 8000
         arg_type = Int
     "--model"
         help = "Model to fit, one of [broken_pl, two_broken_pl, broken_pl_plp, two_broken_pl_plp]"
@@ -56,14 +56,18 @@ model_functions = Dict(
     "two_broken_pl" => two_broken_pl_model,
     "broken_pl_plp" => broken_pl_plp_model,
     "two_broken_pl_plp" => two_broken_pl_plp_model,
-    "pl_plus_gaussian" => power_law_plus_gaussian_model
+    "pl_plus_gaussian" => power_law_plus_gaussian_model,
+    "gaussian" => gaussian_model,
+    "two_gaussian" => two_gaussian_model
 )
 model_suffixes = Dict(
     "broken_pl" => "",
     "two_broken_pl" => "_tb",
     "broken_pl_plp" => "_plp",
     "two_broken_pl_plp" => "_tb_plp",
-    "pl_plus_gaussian" => "_plg"
+    "pl_plus_gaussian" => "_plg",
+    "gaussian" => "_gaussian_plp",
+    "two_gaussian" => "_two_gaussian_plp"
 )
 
 if parsed_args["model"] in keys(model_functions)

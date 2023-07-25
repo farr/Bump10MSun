@@ -22,6 +22,7 @@ include("model.jl")
 export mlow, mhigh, zref, mclow, mchigh
 export isselected, selection_fraction
 export MassFunction, BrokenPowerLaw, TwoBrokenPowerLaw, PowerLawGaussian
+export GaussianMF, TwoGaussianMF
 export PairingFunction, GaussianPairing, PowerLawPairing
 export model_body
 export make_log_dN, make_log_dN_tb
@@ -29,6 +30,7 @@ export broken_pl_model, two_broken_pl_model
 export broken_pl_plp_model, two_broken_pl_plp_model
 export power_law_plus_gaussian_model
 export make_dNdm1, make_dNdm2, make_dNdq, make_dNdm, make_pairing_prob
+export gaussian_model, two_gaussian_model
 
 include("pputils.jl")
 export median_plus_minus, result_macro

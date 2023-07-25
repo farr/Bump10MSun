@@ -13,6 +13,9 @@ const mchigh = 17.41
 """The reference redshift, at which rates are evaluated."""
 const zref = 0.0
 
+"""If we need a mass reference, we use this."""
+const mref = 10.0
+
 """The fraction of likelihood-weighted PE samples that must pass the selection
 criterion to be included in this study."""
 const selection_fraction = 0.9
@@ -24,6 +27,8 @@ square(x) = x*x
 abstract type MassFunction end
 abstract type PairingFunction end
 
+struct GaussianMF <: MassFunction end
+struct TwoGaussianMF <: MassFunction end
 struct BrokenPowerLaw <: MassFunction end
 struct TwoBrokenPowerLaw <: MassFunction end
 struct PowerLawGaussian <: MassFunction end
@@ -34,6 +39,17 @@ struct PowerLawPairing <: PairingFunction end
 function isselected(m1, m2)
   mc = chirp_mass(m1, m2)
   mclow < mc && mc < mchigh && mlow < m2
+end
+
+function _fm(::GaussianMF, m, mu, sigma)
+  -0.5*square((m-mu)/sigma)
+end
+
+function _fm(::TwoGaussianMF, m, f1, mu1, sigma1, mu2, sigma2)
+  log_f1 = log(f1)
+  log_f2 = log1p(-f1)
+
+  logaddexp(log_f1 - 0.5*square((m-mu1)/sigma1) + 0.5*square((mref-mu1)/sigma1), log_f2 - 0.5*square((m-mu2)/sigma2) + 0.5*square((mref-mu2)/sigma2))
 end
 
 # It is convenient that all of these different models are distinguished by their number of arguments.
@@ -245,6 +261,30 @@ function log_dN(m1, m2)
   end
 end
 log_dN
+end
+
+function make_log_dN(mf::GaussianMF, pf::PowerLawPairing, mu, sigma, beta)
+  function log_dN(m1, m2)
+    if isselected(m1, m2)
+      q = m2/m1
+      _fm(mf, m1, mu, sigma) + _fm(mf, m2, mu, sigma) - log(m1) - log(m2) + _pf(pf, q, beta)
+    else
+      -Inf
+    end
+  end
+  log_dN
+end
+
+function make_log_dN(mf::TwoGaussianMF, pf::PowerLawPairing, f1, mu1, sigma1, mu2, sigma2, beta)
+  function log_dN(m1, m2)
+    if isselected(m1, m2)
+      q = m2/m1
+      _fm(mf, m1, f1, mu1, sigma1, mu2, sigma2) + _fm(mf, m2, f1, mu1, sigma1, mu2, sigma2) - log(m1) - log(m2) + _pf(pf, q, beta)
+    else
+      -Inf
+    end
+  end
+  log_dN
 end
 
 """
@@ -725,4 +765,37 @@ end
   Turing.@addlogprob! logl_sum
   Turing.@addlogprob! lognorm_sum
   generated_quantities
+end
+
+@model function gaussian_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  mu ~ Uniform(3, 20)
+  sigma ~ Uniform(0.25, 20)
+  beta ~ Uniform(-5, 5)
+
+  log_dN = make_log_dN(GaussianMF(), PowerLawPairing(), mu, sigma, beta)
+
+  logl_sum, lognorm_sum, generated_quantities = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  Turing.@addlogprob! logl_sum
+  Turing.@addlogprob! lognorm_sum
+  generated_quantities
+end
+
+@model function two_gaussian_model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  f1 ~ Uniform(0, 1)
+  mu1 ~ Uniform(3, 20)
+  sigma1 ~ Uniform(0.25, 20)
+
+  x2 ~ Uniform(0,1)
+  mu2 = mu1 + (20 - mu1)*x2
+  Turing.@addlogprob! log(20 - mu1)
+  sigma2 ~ Uniform(0.25, 20)
+
+  beta ~ Uniform(-5, 5)
+
+  log_dN = make_log_dN(TwoGaussianMF(), PowerLawPairing(), f1, mu1, sigma1, mu2, sigma2, beta)
+
+  logl_sum, lognorm_sum, generated_quantities = model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndraw)
+  Turing.@addlogprob! logl_sum
+  Turing.@addlogprob! lognorm_sum
+  merge(generated_quantities, (mu2=mu2, ))
 end
