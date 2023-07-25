@@ -7,8 +7,9 @@ using Bump10MSun
 using Glob
 using HDF5
 using Logging
-using MCMCChainsStorage
+using MCMCChainsStorage # Needed for `append_generated_quantities`
 using Printf
+using Random
 using StatsBase
 using Turing
 
@@ -25,16 +26,20 @@ s = ArgParseSettings()
         arg_type = Int
     "--nsel"
         help = "Number of detected injections to use to estimate the selection normalization"
-        default = 8192
+        default = 4096
         arg_type = Int
     "--model"
         help = "Model to fit, one of [broken_pl, two_broken_pl, broken_pl_plp, two_broken_pl_plp]"
         default = "broken_pl"
         arg_type = String
     "--target_accept"
-        help = "Target acceptance rate for HMC"
+        help = "Target acceptance rate for NUTS"
         default = 0.85
         arg_type = Float64
+    "--seed"
+        help = "RNG seed"
+        default = 8572587030709747370
+        arg_type = Int
 end
 
 parsed_args = parse_args(s)
@@ -44,6 +49,7 @@ Nchain = Threads.nthreads()
 Npost = parsed_args["npost"]
 Nsel = parsed_args["nsel"]
 target_accept = parsed_args["target_accept"]
+Random.seed!(parsed_args["seed"])
 
 model_functions = Dict(
     "broken_pl" => broken_pl_model,
@@ -67,7 +73,7 @@ else
     error("--model argument must be one of $(keys(model_functions)); got $(parsed_args["model"])")
 end
 
-log_dN_default = make_log_dN(BrokenPowerLaw(), GaussianPairing(), 1.0, -1.0, 10.0, 0.7, 0.5)
+log_dN_default = make_log_dN(BrokenPowerLaw(), GaussianPairing(), 7.6, -3.8, 8.7, 0.60, 1.1)
 
 sampso3a, fnameso3a, gwnameso3a = load_pe_samples("/Users/wfarr/Research/o3a_posterior_samples/all_posterior_samples", "GW*[0-9].h5", "PublicationSamples/posterior_samples")
 sampso3b, fnameso3b, gwnameso3b = load_pe_samples("/Users/wfarr/Research/o3b_data/PE", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
@@ -77,11 +83,24 @@ fnames = vcat(fnameso3a, fnameso3b)
 gwnames = vcat(gwnameso3a, gwnameso3b)
 
 mask = map(samps) do ss
-    median([x.mass_2_source for x in ss]) > mlow && median([x.mass_1_source for x in ss]) < mhigh
+    m1 = [x.mass_1_source for x in ss]
+    m2 = [x.mass_2_source for x in ss]
+    z = [x.redshift for x in ss]
+
+    wt = md_sfr_zwt.(z) ./ li_prior_wt.(m1, m2, z)
+    inds = sample(1:length(z), Weights(wt), 1024)
+
+    sel = isselected.(m1[inds], m2[inds])
+    sum(sel) > selection_fraction*length(sel)
 end
 narrow_samps = samps[mask]
 narrow_fnames = fnames[mask]
 narrow_gwnames = gwnames[mask]
+
+@info "Analyzing $(length(narrow_gwnames)) events:"
+for n in narrow_gwnames
+    @info "  $(n)"
+end
 
 open(joinpath(@__DIR__, "..", "chains", "chain" * suffix * "_fnames.txt"), "w") do f
     for n in narrow_fnames

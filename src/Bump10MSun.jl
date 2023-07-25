@@ -20,7 +20,7 @@ export logpdf_credible_levels
 
 include("model.jl")
 export mlow, mhigh, zref, mclow, mchigh
-export isselected
+export isselected, selection_fraction
 export MassFunction, BrokenPowerLaw, TwoBrokenPowerLaw, PowerLawGaussian
 export PairingFunction, GaussianPairing, PowerLawPairing
 export model_body

@@ -13,6 +13,10 @@ const mchigh = 17.41
 """The reference redshift, at which rates are evaluated."""
 const zref = 0.0
 
+"""The fraction of likelihood-weighted PE samples that must pass the selection
+criterion to be included in this study."""
+const selection_fraction = 0.9
+
 square(x) = x*x
 
 # We use these types as tags to ensure that we evaluate the right functions,
@@ -213,7 +217,8 @@ function make_log_dN(mf::TwoBrokenPowerLaw, pf::PowerLawPairing, a1, a2, a3, mb1
 end
 
 """
-  make_log_dN(PowerLawGaussian(), PowerLawPairing(), alpha, mu, sigma, fg, beta)
+  make_log_dN(PowerLawGaussian(), PowerLawPairing(), a1, a2, mu, sigma, fg,
+  beta)
 
 Produces a function that computes `(m1, m2) -> log_dNdm1dm2` for the power-law
 plus Gaussian population model.
@@ -224,9 +229,11 @@ m_1 m_2 \\frac{\\mathrm{d}N}{\\mathrm{d} m_1 \\mathrm{d} m_2 \\mathrm{d} V \\mat
 ```
 where
 ```math
-f_m \\left( m \\right) = f_g \\exp\\left(-\\frac{1}{2} \\left(\\frac{m-\\mu}{\\sigma} \\right)^2 \\right) + \\left( 1 - f_g \\right) \\left( \\frac{m}{\\mu} \\right)^\\alpha
+f_m \\left( m \\right) = f_g \\exp\\left(-\\frac{1}{2} \\left(\\frac{m-\\mu}{\\sigma} \\right)^2 \\right) + \\left( 1 - f_g \\right) \\left( \\frac{m}{\\mu} \\right)^{\\alpha_1, \\alpha_2}
 ```
-is a sum of a power-law "continuium" and a Gaussian "peak."  As written, `R` is the merger rate per log mass squared at `m1 = m2 = mu`.
+is a sum of broken power-law "continuium" and a Gaussian "peak."  ``\\alpha_1``
+is used when ``m < \\mu`` and ``\\alpha_2`` when ``m > \\mu``.  As written, `R`
+is the merger rate per log mass squared at `m1 = m2 = mu`.
 """
 function make_log_dN(mf::PowerLawGaussian, pf::PowerLawPairing, a1, a2, mu, sigma, fg, beta)
 function log_dN(m1, m2)
