@@ -18,7 +18,7 @@ const mref = 10.0
 
 """The fraction of likelihood-weighted PE samples that must pass the selection
 criterion to be included in this study."""
-const selection_fraction = 0.9
+const selection_fraction = 0.5
 
 square(x) = x*x
 
@@ -37,8 +37,7 @@ struct GaussianPairing <: PairingFunction end
 struct PowerLawPairing <: PairingFunction end
 
 function isselected(m1, m2)
-  mc = chirp_mass(m1, m2)
-  mclow < mc && mc < mchigh && mlow < m2
+  mlow <= m2 && m2 <= m1 && m1 <= mhigh
 end
 
 function _fm(::GaussianMF, m, mu, sigma)

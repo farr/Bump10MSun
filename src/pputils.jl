@@ -46,22 +46,16 @@ end
 
 """Map from model to suffix for chain files"""
 suffix_map = Dict(
-    (BrokenPowerLaw(), GaussianPairing()) => "",
-    (BrokenPowerLaw(), PowerLawPairing()) => "_plp",
-    (TwoBrokenPowerLaw(), GaussianPairing()) => "_tb",
-    (TwoBrokenPowerLaw(), PowerLawPairing()) => "_tb_plp",
-    (PowerLawGaussian(), PowerLawPairing()) => "_plg",
-    (GaussianMF(), PowerLawPairing()) => "_gaussian_plp",
-    (TwoGaussianMF(), PowerLawPairing()) => "_two_gaussian_plp"
+    (BrokenPowerLaw(), PowerLawPairing()) => "_bpl",
+    (PowerLawGaussian(), PowerLawPairing()) => "_bplg",
+    (GaussianMF(), PowerLawPairing()) => "_g"
 )
 
 """Map from model to variable names for mass function variables."""
 mf_var_name_map = Dict(
     BrokenPowerLaw() => [:R, :a1, :a2, :mb],
-    TwoBrokenPowerLaw() => [:R, :a1, :a2, :a3, :mb12, :mb23],
     PowerLawGaussian() => [:R, :a1, :a2, :mu, :sigma, :fg],
-    GaussianMF() => [:R, :mu, :sigma],
-    TwoGaussianMF() => [:R, :f1, :mu1, :sigma1, :mu2, :sigma2]
+    GaussianMF() => [:R, :mu, :sigma]
 )
 
 """Map from model to variable names for pairing function variables."""
@@ -76,10 +70,8 @@ var_name_map = Dict((km, kp) => vcat(mv, pv) for (km, mv) in pairs(mf_var_name_m
 """Map from model to plot labels for mass function models."""
 mf_label_map = Dict(
     BrokenPowerLaw() => "Broken PL",
-    TwoBrokenPowerLaw() => "Two Broken PL",
-    PowerLawGaussian() => "Power Law + Gaussian",
-    GaussianMF() => "Gaussian",
-    TwoGaussianMF() => "Two Gaussian"
+    PowerLawGaussian() => "Broken Power Law + Gaussian",
+    GaussianMF() => "Gaussian"
 )
 """Map from model to plot labels for pairing function models."""
 pf_label_map = Dict(

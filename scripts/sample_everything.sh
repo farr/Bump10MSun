@@ -1,7 +1,5 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 
+julia -t 4 sample.jl --model broken_pl_gaussian
 julia -t 4 sample.jl --model broken_pl
-julia -t 4 sample.jl --model two_broken_pl
-julia -t 4 sample.jl --model broken_pl_plp
-julia -t 4 sample.jl --model two_broken_pl_plp
-julia -t 4 sample.jl --model pl_plus_gaussian
+julia -t 4 sample.jl --model gaussian

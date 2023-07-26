@@ -26,12 +26,13 @@ s = ArgParseSettings()
         arg_type = Int
     "--nsel"
         help = "Number of detected injections to use to estimate the selection normalization"
-        default = 8000
+        default = 2048
         arg_type = Int
     "--model"
         help = "Model to fit, one of [broken_pl, two_broken_pl, broken_pl_plp, two_broken_pl_plp]"
         default = "broken_pl"
         arg_type = String
+        required = true
     "--target_accept"
         help = "Target acceptance rate for NUTS"
         default = 0.85
@@ -52,22 +53,14 @@ target_accept = parsed_args["target_accept"]
 Random.seed!(parsed_args["seed"])
 
 model_functions = Dict(
-    "broken_pl" => broken_pl_model,
-    "two_broken_pl" => two_broken_pl_model,
-    "broken_pl_plp" => broken_pl_plp_model,
-    "two_broken_pl_plp" => two_broken_pl_plp_model,
-    "pl_plus_gaussian" => power_law_plus_gaussian_model,
-    "gaussian" => gaussian_model,
-    "two_gaussian" => two_gaussian_model
+    "broken_pl" => broken_pl_plp_model,
+    "broken_pl_gaussian" => power_law_plus_gaussian_model,
+    "gaussian" => gaussian_model
 )
 model_suffixes = Dict(
-    "broken_pl" => "",
-    "two_broken_pl" => "_tb",
-    "broken_pl_plp" => "_plp",
-    "two_broken_pl_plp" => "_tb_plp",
-    "pl_plus_gaussian" => "_plg",
-    "gaussian" => "_gaussian_plp",
-    "two_gaussian" => "_two_gaussian_plp"
+    "broken_pl" => "_bpl",
+    "broken_pl_gaussian" => "_bplg",
+    "gaussian" => "_g"
 )
 
 if parsed_args["model"] in keys(model_functions)
