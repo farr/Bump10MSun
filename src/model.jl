@@ -481,14 +481,13 @@ function model_body(log_dN, m1s, m2s, log_wts, m1s_sel, m2s_sel, log_pdraw, Ndra
   end
   log_mu = logsumexp(log_wts_sel) - log(Ndraw)
   log_s2 = logsubexp(logsumexp(2 .* log_wts_sel) - 2.0*log(Ndraw), 2*log_mu - log(Ndraw))
-  Neff_sel = exp(2*log_mu - log_s2)
+  Neff_sel_est = exp(2*log_mu - log_s2)
+  Neff_sel = 1/(1/Neff_sel_est + 1/Ndraw)
 
   log_norm_sum = -Nobs*log_mu
 
-  mu_R = Nobs/exp(log_mu)
-  sigma_R = sqrt(Nobs) / exp(log_mu)
-
-  R = rand(Normal(mu_R, sigma_R))
+  mu = exp(log_mu)
+  R = rand(Normal(Nobs/mu, sqrt(Nobs)/mu))
   
   m1_m2_draw = map(m1s, m2s, log_wts) do mm1, mm2, log_wwt
       i = rand(Categorical(exp.(log_wwt .- logsumexp(log_wwt))))

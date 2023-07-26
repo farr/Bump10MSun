@@ -26,7 +26,7 @@ s = ArgParseSettings()
         arg_type = Int
     "--nsel"
         help = "Number of detected injections to use to estimate the selection normalization"
-        default = 2048
+        default = 8192
         arg_type = Int
     "--model"
         help = "Model to fit, one of [broken_pl, two_broken_pl, broken_pl_plp, two_broken_pl_plp]"
@@ -70,7 +70,7 @@ else
     error("--model argument must be one of $(keys(model_functions)); got $(parsed_args["model"])")
 end
 
-log_dN_default = make_log_dN(BrokenPowerLaw(), GaussianPairing(), 7.6, -3.8, 8.7, 0.60, 1.1)
+log_dN_default = make_log_dN(BrokenPowerLaw(), PowerLawPairing(), 2.0, -2.0, 9.5, 2.0)
 
 sampso3a, fnameso3a, gwnameso3a = load_pe_samples("/Users/wfarr/Research/o3a_posterior_samples/all_posterior_samples", "GW*[0-9].h5", "PublicationSamples/posterior_samples")
 sampso3b, fnameso3b, gwnameso3b = load_pe_samples("/Users/wfarr/Research/o3b_data/PE", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")

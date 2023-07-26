@@ -11,13 +11,17 @@ end
 
 Return a kernel density object out of the given points.
 
-`pts` should have shape `(ndim, npts)`.
+`pts` should have shape `(ndim, npts)` or `(npts,)` for a 1-dimensional KDE.
 """
 function KDE(pts::Matrix{Float64})
     nd, np = size(pts)
     S = cov(pts') ./ np^(2/(nd+4))
 
     KDE(pts, cholesky(S))
+end
+
+function KDE(pts::Vector{Float64})
+    KDE(reshape(pts, 1, :))
 end
 
 """The number of dimensions in the KDE."""
