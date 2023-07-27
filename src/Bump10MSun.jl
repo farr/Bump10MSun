@@ -15,7 +15,7 @@ using UnitfulAstro
 using Trapz
 
 include("kde.jl")
-export KDE
+export KDE, BoundedKDE
 export logpdf_credible_levels
 
 include("model.jl")

@@ -123,3 +123,24 @@ function bisect_loop(f, fl, fh, xl, xh)
         end
     end
 end
+
+"""
+    bounded_kde_pdf(xs::AbstractArray; low=nothing, high=nothing)
+
+Return a PDF function for a KDE of `xs` on a domain that is bounded by `low` and
+`high`.
+"""
+function bounded_kde_pdf(xs::AbstractArray; low=nothing, high=nothing)
+    k = KDE(xs)
+    function mypdf(x)
+        p = pdf(k, [x])
+        if low !== nothing
+            p += pdf(k, [2*low-x])
+        end
+        if high !== nothing
+            p += pdf(k, [2*high-x])
+        end
+        p
+    end
+    mypdf
+end
