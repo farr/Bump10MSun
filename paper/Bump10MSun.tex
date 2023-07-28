@@ -89,10 +89,10 @@ or a sum of a broken power law and a Gaussian,
         \left( \frac{m}{\mu} \right)^{\alpha_2} & \mu < m
     \end{cases}.
 \end{equation}
-The ``pairing function'' \citep{Fishbach2020} $g$ is a power law in the mass
-ratio,
+The ``pairing function'' \citep{Fishbach2020} $g$ is a power law in the total
+mass,
 \begin{equation}
-    g(m_1, m_2) = \left( \frac{m_2}{m_1} \right)^{\beta}.
+    g(m_1, m_2) = \left( \frac{1 + \frac{m_2}{m_1}}{2} \right)^{\beta}.
 \end{equation}
 With these definitions, $R$ is the merger rate per natural log mass squared, per
 comoving volume, per time at redshift $z = 0$, $m_1 = m_2 = \mu, m_b$.  We use
@@ -141,24 +141,21 @@ for $m_\mathrm{low} \leq m \leq m_\mathrm{high}$ we will write
     \caption{\label{fig:pm-traces} Inferred common mass distribution, $p(m)$,
     (see Eq.~\eqref{eq:pm-definition}) for both models considered in this
     analysis.  Dark lines show the posterior mean mass distribution; light lines
-    are individual draws from the posterior over mass distributions.  The
-    vertical lines and bands give the posterior median, $\pm 1 \sigma$ (68\%),
-    and $\pm 2\sigma$ (95\%) credible ranges for the first percentile of the
-    mass distribution, $m_{1\%}$.  It is clear that our fits permit, but do not
-    require, that the first percentile of the common mass function lives in the
-    ``mass gap'' region $3 \, M_\odot \leq m_{1,\%} \leq 5 \, M_\odot$.  At high
+    are individual draws from the posterior over mass distributions.  At high
     masses, $m \gg \mu, m_b$, the mass function falls steeply in both models;
     the broken power law plus Gaussian slope $\alpha_2 = \alphatwoplgplp$.
-    Toward lower masses from the peak, both models initially decline
-    significantly \ldots.}
+    Toward lower masses from the peak, both power law models initially decline
+    significantly, though the power law plus Gaussian model rises again as $m
+    \to 3 \, M_\odot$.}
 \end{figure}
 
 \begin{figure}
     \includegraphics[width=\columnwidth]{figures/m1pct.pdf}
     \caption{\label{fig:m1pct} The posterior distribution for $m_{1\%}$, the
     first percentile of the ``common'' mass function for our three models.  The
-    broken power law plus Gaussian model has $m_{1\%} = \monepctplgplpunits$ at
-    $1\sigma$ (68\%) credibility.}
+    broken power law plus Gaussian model with 50\% selection cut has $m_{1\%} =
+    \monepctplgplpunits$ at $1\sigma$ (68\%) credibility.  The solid lines are
+    the result for the 50\% selection cut, dashed for the 90\% selection cut.}
 \end{figure}
 
 \begin{figure}
@@ -169,6 +166,16 @@ for $m_\mathrm{low} \leq m \leq m_\mathrm{high}$ we will write
     mass function at its peak in the broken power law plus Gaussian model.
     Credible levels are spaced by 10\% in posterior mass.}
 \end{figure}
+
+\begin{figure}
+    \includegraphics[width=\columnwidth]{figures/fg.pdf}
+    \caption{\label{fig:fg} The posterior distribution for $f_g$, the fraction
+    of the merger rate attributed to the Gaussian component of the power law
+    plus Gaussian model at the Gaussian peak.  The solid line is the result with
+    50\% selection cut, the dashed line is the result with 90\% selection cut.}
+\end{figure}
+
+\input{table1_content.tex}
 
 \clearpage
 

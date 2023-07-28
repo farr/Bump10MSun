@@ -34,7 +34,7 @@ export make_dNdm1, make_dNdm2, make_dNdq, make_dNdm, make_pairing_prob
 export gaussian_model, two_gaussian_model
 
 include("pputils.jl")
-export median_plus_minus, result_macro
+export median_plus_minus, median_hdi, result_macro
 export suffix_map, label_map, var_name_map
 export mf_label_map, mf_var_name_map
 export pf_label_map, pf_var_name_map

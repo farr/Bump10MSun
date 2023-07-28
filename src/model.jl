@@ -81,13 +81,8 @@ else
 end
 end
 
-function _pf(::GaussianPairing, q, mu, sigma)
--0.5*square((q-mu)/sigma) + 0.5*square(1-mu)/sigma
-end
-
-function _pf(::PowerLawPairing, q, beta)
-beta*log(q)
-end
+_pf(::GaussianPairing, q, mu, sigma) = -0.5*square((q-mu)/sigma) + 0.5*square(1-mu)/sigma
+_pf(::PowerLawPairing, q, beta) = beta*(log1p(q) - log(2))
 
 """
   make_log_dN(BrokenPowerLaw(), GaussianPairing(), a1, a2, mb, mu_q, sigma_q)
@@ -133,7 +128,7 @@ single-break power law population model.
 The population model is 
 
 ```math
-m_1 m_2 \\frac{\\mathrm{d}N}{\\mathrm{d} m_1 \\mathrm{d} m_2 \\mathrm{d} V \\mathrm{d} t} = R f_m\\left( m_1 \\right) f_m\\left( m_2 \\right) q^\\beta
+m_1 m_2 \\frac{\\mathrm{d}N}{\\mathrm{d} m_1 \\mathrm{d} m_2 \\mathrm{d} V \\mathrm{d} t} = R f_m\\left( m_1 \\right) f_m\\left( m_2 \\right) \\left(\\frac{1 + q}{2}\\right)^\\beta
 ```
 where
 ```math
@@ -143,7 +138,7 @@ m^{\\alpha_2} & m_b \\leq m < m_\\mathrm{max}
 \\end{cases}
 ```
 is the "common" black hole mass function, and a power-law pairing function in
-``q`` is used with parameter ``beta``.  The function returned is normalized so
+``1+q`` is used with parameter ``beta``.  The function returned is normalized so
 that ``R`` measures the volumetric merger rate per natural log mass squared at
 `m1 = m2 = m_b`.
 """
@@ -204,7 +199,7 @@ power law population model.
 The population model is 
 
 ```math
-m_1 m_2 \\frac{\\mathrm{d}N}{\\mathrm{d} m_1 \\mathrm{d} m_2 \\mathrm{d} V \\mathrm{d} t} = R f_m\\left( m_1 \\right) f_m\\left( m_2 \\right) q^\\beta
+m_1 m_2 \\frac{\\mathrm{d}N}{\\mathrm{d} m_1 \\mathrm{d} m_2 \\mathrm{d} V \\mathrm{d} t} = R f_m\\left( m_1 \\right) f_m\\left( m_2 \\right) \\left( \\frac{1+q}{2} \\right)^\\beta
 ```
 where
 ```math
@@ -240,7 +235,7 @@ plus Gaussian population model.
 
 The population model is 
 ```math
-m_1 m_2 \\frac{\\mathrm{d}N}{\\mathrm{d} m_1 \\mathrm{d} m_2 \\mathrm{d} V \\mathrm{d} t} = R f_m\\left( m_1 \\right) f_m\\left( m_2 \\right) q^\\beta
+m_1 m_2 \\frac{\\mathrm{d}N}{\\mathrm{d} m_1 \\mathrm{d} m_2 \\mathrm{d} V \\mathrm{d} t} = R f_m\\left( m_1 \\right) f_m\\left( m_2 \\right) \\left( \\frac{1+q}{2} \\right)^\\beta
 ```
 where
 ```math

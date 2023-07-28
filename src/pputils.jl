@@ -1,4 +1,21 @@
 """
+    hdi_interval(xs::AbstractVector, q)
+
+Return `(l,h)`, the shortest interval that contains a fraction `q` of the values
+in `xs`.
+"""
+function hdi_interval(xs::AbstractVector, q)
+    xs = sort(xs)
+    n = length(xs)
+    nn = round(Int, n*q)
+
+    dx = xs[nn:end] .- xs[1:end-nn+1]
+    i = argmin(dx)
+
+    (xs[i], xs[i+nn-1])
+end
+
+"""
     median_plus_minus(x, q=0.68)
 
 Return the median and `(q+1)/2` and `(1-q)/2` quantiles of the collection `x`.
@@ -10,6 +27,20 @@ function median_plus_minus(x, q=0.68)
     h = quantile(x, (q+1)/2)
     l = quantile(x, (1-q)/2)
     (m, h, l)
+end
+
+"""
+    median_hdi(x, q=0.68)
+
+Return median and highest density `q` interval of the collection `x`.
+"""
+function median_hdi(x, q=0.68)
+    @assert (zero(q) < q && q < one(q))
+    x = vec(x)
+    m = median(x)
+    l, h = hdi_interval(x, q)
+
+    return (m, h, l)
 end
 
 raw"""
@@ -27,8 +58,14 @@ julia> result_macro(raw"\height", raw"\mathrm{m}", range(1.9, stop=2.1, length=2
 "\\newcommand{\\height}{\\ensuremath{2.0^{+0.068}_{-0.068}}}\n\\newcommand{\\height_units}{\\ensuremath{\\height \\, \\mathrm{m}}}"
 ```
 """
-function result_macro(mname, samples; digits=1, q=0.68)
-    m,h,l = median_plus_minus(samples, q)
+function result_macro(mname, samples; digits=1, q=0.68, interval_type=:hdi)
+    if interval_type === :hdi
+        m,h,l = median_hdi(samples, q)
+    elseif interval_type === :symmetric
+        m,h,l = median_plus_minus(samples, q)
+    else
+        error("unrecognized interval type $(interval_type)")
+    end
     if digits <= 0
         mr = Int(round(m, digits=digits))
         hr = Int(round(h-m, digits=digits))
@@ -143,21 +180,4 @@ function bounded_kde_pdf(xs::AbstractArray; low=nothing, high=nothing)
         p
     end
     mypdf
-end
-
-"""
-    hdi_interval(xs::AbstractVector, q)
-
-Return `(l,h)`, the shortest interval that contains a fraction `q` of the values
-in `xs`.
-"""
-function hdi_interval(xs::AbstractVector, q)
-    xs = sort(xs)
-    n = length(xs)
-    nn = round(Int, n*q)
-
-    dx = xs[nn:end] .- xs[1:end-nn+1]
-    i = argmin(dx)
-
-    (xs[i], xs[i+nn-1])
 end
