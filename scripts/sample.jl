@@ -33,6 +33,10 @@ s = ArgParseSettings()
         default = "broken_pl"
         arg_type = String
         required = true
+    "--selection_fraction"
+        help = "Fraction of likelihood required to be inside selection limits"
+        default = default_selection_fraction
+        arg_type = Float64
     "--target_accept"
         help = "Target acceptance rate for NUTS"
         default = 0.85
@@ -50,6 +54,7 @@ Nchain = Threads.nthreads()
 Npost = parsed_args["npost"]
 Nsel = parsed_args["nsel"]
 target_accept = parsed_args["target_accept"]
+selection_fraction = parsed_args["selection_fraction"]
 Random.seed!(parsed_args["seed"])
 
 model_functions = Dict(
@@ -66,6 +71,12 @@ model_suffixes = Dict(
 if parsed_args["model"] in keys(model_functions)
     model = model_functions[parsed_args["model"]]
     suffix = model_suffixes[parsed_args["model"]]
+
+    if selection_fraction == default_selection_fraction
+        # Do nothing
+    else
+        suffix = suffix * @sprintf("_sel%0.2f", parsed_args["selection_fraction"])
+    end
 else
     error("--model argument must be one of $(keys(model_functions)); got $(parsed_args["model"])")
 end

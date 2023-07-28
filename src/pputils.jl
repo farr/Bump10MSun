@@ -144,3 +144,20 @@ function bounded_kde_pdf(xs::AbstractArray; low=nothing, high=nothing)
     end
     mypdf
 end
+
+"""
+    hdi_interval(xs::AbstractVector, q)
+
+Return `(l,h)`, the shortest interval that contains a fraction `q` of the values
+in `xs`.
+"""
+function hdi_interval(xs::AbstractVector, q)
+    xs = sort(xs)
+    n = length(xs)
+    nn = round(Int, n*q)
+
+    dx = xs[nn:end] .- xs[1:end-nn+1]
+    i = argmin(dx)
+
+    (xs[i], xs[i+nn-1])
+end

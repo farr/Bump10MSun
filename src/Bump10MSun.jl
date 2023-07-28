@@ -2,6 +2,7 @@ module Bump10MSun
 
 using Cosmology
 using Distributions
+using GaussianKDEs
 using Glob
 using HDF5
 using Interpolations
@@ -20,7 +21,7 @@ export logpdf_credible_levels
 
 include("model.jl")
 export mlow, mhigh, zref, mclow, mchigh
-export isselected, selection_fraction
+export isselected, default_selection_fraction
 export MassFunction, BrokenPowerLaw, TwoBrokenPowerLaw, PowerLawGaussian
 export GaussianMF, TwoGaussianMF
 export PairingFunction, GaussianPairing, PowerLawPairing
@@ -39,6 +40,7 @@ export mf_label_map, mf_var_name_map
 export pf_label_map, pf_var_name_map
 export distribution_quantile
 export bisect
+export hdi_interval
 
 include("weights.jl")
 export li_prior_wt, md_sfr, md_sfr_zwt, read_selection

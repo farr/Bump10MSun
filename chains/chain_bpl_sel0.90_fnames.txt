@@ -1,0 +1,13 @@
+/Users/wfarr/Research/o3a_posterior_samples/all_posterior_samples/GW190707_093326.h5
+/Users/wfarr/Research/o3a_posterior_samples/all_posterior_samples/GW190720_000836.h5
+/Users/wfarr/Research/o3a_posterior_samples/all_posterior_samples/GW190728_064510.h5
+/Users/wfarr/Research/o3a_posterior_samples/all_posterior_samples/GW190924_021846.h5
+/Users/wfarr/Research/o3a_posterior_samples/all_posterior_samples/GW190930_133541.h5
+/Users/wfarr/Research/o3b_data/PE/IGWN-GWTC3p0-v1-GW191103_012549_PEDataRelease_mixed_nocosmo.h5
+/Users/wfarr/Research/o3b_data/PE/IGWN-GWTC3p0-v1-GW191105_143521_PEDataRelease_mixed_nocosmo.h5
+/Users/wfarr/Research/o3b_data/PE/IGWN-GWTC3p0-v1-GW191126_115259_PEDataRelease_mixed_nocosmo.h5
+/Users/wfarr/Research/o3b_data/PE/IGWN-GWTC3p0-v1-GW191129_134029_PEDataRelease_mixed_nocosmo.h5
+/Users/wfarr/Research/o3b_data/PE/IGWN-GWTC3p0-v1-GW191204_171526_PEDataRelease_mixed_nocosmo.h5
+/Users/wfarr/Research/o3b_data/PE/IGWN-GWTC3p0-v1-GW191216_213338_PEDataRelease_mixed_nocosmo.h5
+/Users/wfarr/Research/o3b_data/PE/IGWN-GWTC3p0-v1-GW200202_154313_PEDataRelease_mixed_nocosmo.h5
+/Users/wfarr/Research/o3b_data/PE/IGWN-GWTC3p0-v1-GW200316_215756_PEDataRelease_mixed_nocosmo.h5

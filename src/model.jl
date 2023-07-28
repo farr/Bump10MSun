@@ -18,7 +18,7 @@ const mref = 10.0
 
 """The fraction of likelihood-weighted PE samples that must pass the selection
 criterion to be included in this study."""
-const selection_fraction = 0.5
+const default_selection_fraction = 0.5
 
 square(x) = x*x
 
