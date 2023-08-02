@@ -64,10 +64,28 @@ function read_selection(file)
         m2s = convert(Vector{Float64}, read(i, "mass2_source"))
         zs = convert(Vector{Float64}, read(i, "redshift"))
     
+        s1x = convert(Vector{Float64}, read(i, "spin1x"))
+        s1y = convert(Vector{Float64}, read(i, "spin1y"))
+        s1z = convert(Vector{Float64}, read(i, "spin1z"))
+
+        s2x = convert(Vector{Float64}, read(i, "spin2x"))
+        s2y = convert(Vector{Float64}, read(i, "spin2y"))
+        s2z = convert(Vector{Float64}, read(i, "spin2z"))
+
+        a1 = sqrt.(s1x .* s1x .+ s1y .* s1y .+ s1z .* s1z)
+        a2 = sqrt.(s2x .* s2x .+ s2y .* s2y .+ s2z .* s2z)
+
+        # p(a) da dOmega = const
+        # d(xyz) = a^2 da dOmega => da dOmega / d(xyz) = 1/a^2
+
+        pxyz1 = 1 ./ (a1 .* a1)
+        pxyz2 = 1 ./ (a2 .* a2)
+
         T = read(attributes(f), "analysis_time_s") / (356.25*24.0*3600.0) # yr
 
-        pm1m2z = convert(Vector{Float64}, read(i, "mass1_source_mass2_source_sampling_pdf") .* read(i, "redshift_sampling_pdf"))
-        pdraw = pm1m2z / T
+        pm1m2zs1s2 = convert(Vector{Float64}, read(i, "sampling_pdf"))
+        # p(m1, m2, z, s1, s1) / p(s1) / p(s2) / T => p(m1, m2, z, t)
+        pdraw = pm1m2zs1s2 ./ T ./ pxyz1 ./ pxyz2
 
         sel_flag = (read(i, "ifar_cwb") .> 1) .| (read(i, "ifar_gstlal") .> 1) .| (read(i, "ifar_mbta") .> 1) .| (read(i, "ifar_pycbc_bbh") .> 1) .| (read(i, "ifar_pycbc_hyperbank") .> 1)
     

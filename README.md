@@ -13,10 +13,3 @@ posterior samples [here](https://zenodo.org/record/5546663#.Yf9Uge7ML0o), and
 the search sensitivity data files for O3
 [here](https://zenodo.org/record/5546676#.Yf9UMe7ML0o) and modify the paths in
 `scripts/sample.jl` accordingly.
-
-You will also need to manually add the (as yet unregistered) `GaussianKDEs.jl`
-package.  From the top directory of this repository, run 
-```julia
-> using Pkg
-> Pkg.add("https://github.com/farr/GaussianKDEs.jl.git")
-```

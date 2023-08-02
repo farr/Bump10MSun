@@ -21,9 +21,9 @@ export logpdf_credible_levels
 
 include("model.jl")
 export mlow, mhigh, zref, mclow, mchigh
+export m_lower_limit, m_upper_limit
 export isselected, default_selection_fraction
-export MassFunction, BrokenPowerLaw, TwoBrokenPowerLaw, PowerLawGaussian
-export GaussianMF, TwoGaussianMF
+export MassFunction, BrokenPowerLaw, PowerLawGaussian
 export PairingFunction, GaussianPairing, PowerLawPairing
 export model_body
 export make_log_dN, make_log_dN_tb
