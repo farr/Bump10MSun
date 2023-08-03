@@ -26,6 +26,9 @@ const mref = 10.0
 criterion to be included in this study."""
 const default_selection_fraction = 0.5
 
+"""Below this mass, use NS mass function; above, BH."""
+const mmax_ns = 3.0
+
 square(x) = x*x
 
 # We use these types as tags to ensure that we evaluate the right functions,
@@ -46,23 +49,27 @@ end
 # It is convenient that all of these different models are distinguished by their number of arguments.
 function _fm(::BrokenPowerLaw, m, a1, a2, mb, fns, mu_ns, sigma_ns)
   x = m/mb
-  if  m < mb
-      log_pl = a1*log(x)
+  if m < mmax_ns
+    log(fns) - 0.5*square((m-mu_ns)/sigma_ns)
+  elseif m < mb
+      a1*log(x)
   else
-      log_pl = a2*log(x)
+      a2*log(x)
   end
-  logaddexp(log_pl, log(fns) - 0.5*square((m-mu_ns)/sigma_ns))
 end
 
 function _fm(::PowerLawGaussian, m, a1, a2, mu, sigma, fg, fns, mu_ns, sigma_ns)
-  log_fg = log(fg)
-  log_fpl = log1p(-fg)
-  if m < mu
-    log_plg = logaddexp(log_fpl + a1*log(m/mu), log_fg - 0.5*square((m-mu)/sigma))
+  if m < mmax_ns
+    log(fns) - 0.5*square((m-mu_ns)/sigma_ns)
   else
-    log_plg = logaddexp(log_fpl + a2*log(m/mu), log_fg - 0.5*square((m-mu)/sigma))
+    log_fg = log(fg)
+    log_fpl = log1p(-fg)
+    if m < mu
+      log_plg = logaddexp(log_fpl + a1*log(m/mu), log_fg - 0.5*square((m-mu)/sigma))
+    else
+      log_plg = logaddexp(log_fpl + a2*log(m/mu), log_fg - 0.5*square((m-mu)/sigma))
+    end
   end
-  logaddexp(log_plg, log(fns) - 0.5*square((m-mu_ns)/sigma_ns))
 end
 
 _pf(::GaussianPairing, q, mu, sigma) = -0.5*square((q-mu)/sigma) + 0.5*square(1-mu)/sigma
