@@ -58,14 +58,8 @@ julia> result_macro(raw"\height", raw"\mathrm{m}", range(1.9, stop=2.1, length=2
 "\\newcommand{\\height}{\\ensuremath{2.0^{+0.068}_{-0.068}}}\n\\newcommand{\\height_units}{\\ensuremath{\\height \\, \\mathrm{m}}}"
 ```
 """
-function result_macro(mname, samples; digits=1, q=0.68, interval_type=:hdi)
-    if interval_type === :hdi
-        m,h,l = median_hdi(samples, q)
-    elseif interval_type === :symmetric
-        m,h,l = median_plus_minus(samples, q)
-    else
-        error("unrecognized interval type $(interval_type)")
-    end
+function result_macro(mname, samples; digits=1, q=0.68)
+    m,h,l = median_plus_minus(samples, q)
     if digits <= 0
         mr = Int(round(m, digits=digits))
         hr = Int(round(h-m, digits=digits))

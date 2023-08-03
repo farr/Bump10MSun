@@ -75,11 +75,13 @@ function read_selection(file)
         a1 = sqrt.(s1x .* s1x .+ s1y .* s1y .+ s1z .* s1z)
         a2 = sqrt.(s2x .* s2x .+ s2y .* s2y .+ s2z .* s2z)
 
-        # p(a) da dOmega = const
-        # d(xyz) = a^2 da dOmega => da dOmega / d(xyz) = 1/a^2
+        # p(a, Omega) = 1/(4*pi) 
+        # p(xyz) d(xyz) = p(a, Omega) da dOmega
+        # p(xyz) a^2 da dOmega = p(a, Omega) da dOmega
+        # p(xyz) = p(a, Omega) / a^2
 
-        pxyz1 = 1 ./ (a1 .* a1)
-        pxyz2 = 1 ./ (a2 .* a2)
+        pxyz1 = 1 ./ (4 .* pi .* a1 .* a1)
+        pxyz2 = 1 ./ (4 .* pi .* a2 .* a2)
 
         T = read(attributes(f), "analysis_time_s") / (356.25*24.0*3600.0) # yr
 

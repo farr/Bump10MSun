@@ -36,6 +36,7 @@ export gaussian_model, two_gaussian_model
 include("pputils.jl")
 export median_plus_minus, median_hdi, result_macro
 export suffix_map, label_map, var_name_map
+export ns_var_names
 export mf_label_map, mf_var_name_map
 export pf_label_map, pf_var_name_map
 export distribution_quantile
