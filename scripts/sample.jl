@@ -28,7 +28,7 @@ s = ArgParseSettings()
         arg_type = Int
     "--nsel"
         help = "Number of detected injections to use to estimate the selection normalization"
-        default = 2048
+        default = 4096
         arg_type = Int
     "--model"
         help = "Model to fit, one of [broken_pl, two_broken_pl, broken_pl_plp, two_broken_pl_plp]"
@@ -70,9 +70,9 @@ else
     error("--model argument must be one of $(keys(model_functions)); got $(parsed_args["model"])")
 end
 
-log_dN_default = make_log_dN(BrokenPowerLaw(), PowerLawPairing(), 2.0, -2.0, 9.5, 2.0, 10.0, 1.5, 1.0)
+log_dN_default = make_log_dN(PowerLawGaussian(), PowerLawPairing(), 3.2, -2.2, 9.8, 1.6, 0.77, -1.7, 0.14, 1.1, 0.94)
 
-sampso3a, fnameso3a, gwnameso3a = load_pe_samples("/Users/wfarr/Research/o3a_posterior_samples/all_posterior_samples", "GW*[0-9].h5", "PublicationSamples/posterior_samples")
+sampso3a, fnameso3a, gwnameso3a = load_pe_samples("/Users/wfarr/Research/gwtc-2.1", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
 sampso3b, fnameso3b, gwnameso3b = load_pe_samples("/Users/wfarr/Research/o3b_data/PE", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
 gwtc3_table = DataFrame(CSV.File("/Users/wfarr/Research/gwtc-3-tables/GWTC.csv"))
 
@@ -80,33 +80,7 @@ samps = vcat(sampso3a, sampso3b)
 fnames = vcat(fnameso3a, fnameso3b)
 gwnames = vcat(gwnameso3a, gwnameso3b)
 
-mask = map(samps) do ss
-    m1 = [x.mass_1_source for x in ss]
-    m2 = [x.mass_2_source for x in ss]
-    z = [x.redshift for x in ss]
-
-    wt = md_sfr_zwt.(z) ./ li_prior_wt.(m1, m2, z)
-    inds = sample(1:length(z), Weights(wt), 1024)
-
-    sel = isselected.(m1[inds], m2[inds])
-    sum(sel) > default_selection_fraction*length(sel)
-end
-narrow_samps = samps[mask]
-narrow_fnames = fnames[mask]
-narrow_gwnames = gwnames[mask]
-
-mask = map(narrow_gwnames) do n
-    m = false
-    for (gn, far) in zip(gwtc3_table[!,:commonName], gwtc3_table[!,:far])
-        if occursin(n, gn) && far < 1
-            m = true
-        end
-    end
-    m
-end
-narrow_samps = narrow_samps[mask]
-narrow_fnames = narrow_fnames[mask]
-narrow_gwnames = narrow_gwnames[mask]
+narrow_samps, narrow_fnames, narrow_gwnames = filter_selected(samps, fnames, gwnames, gwtc3_table)
 
 @info "Analyzing $(length(narrow_gwnames)) events:"
 for n in narrow_gwnames
@@ -135,7 +109,7 @@ m1s = [[xs[i].mass_1_source for i in is] for (xs, is) in zip(narrow_samps, inds)
 m2s = [[xs[i].mass_2_source for i in is] for (xs, is) in zip(narrow_samps, inds)]
 log_wts = [[log(w[i]) for i in is] for (w, is) in zip(pop_wts, inds)]
 
-m1s_sel, m2s_sel, zs_sel, pdraw, Ndraw = read_selection("/Users/wfarr/Research/o3b_data/O3-Sensitivity/endo3_mixture-LIGO-T2100113-v12.hdf5")
+m1s_sel, m2s_sel, zs_sel, pdraw, Ndraw = read_selection("/Users/wfarr/Research/o3b_data/O1O2O3-Sensitivity/o1+o2+o3_mixture_real+semianalytic-LIGO-T2100377-v2.hdf5")
 pdraw = pdraw ./ (md_sfr_zwt.(zs_sel) ./ md_sfr(zref))
 m1s_sel, m2s_sel, pdraw, Ndraw = resample_selection(log_dN_default, m1s_sel, m2s_sel, pdraw, Ndraw)
 @info "Number of resampled selection function samples = $(Ndraw)"
@@ -156,7 +130,7 @@ end
 trace = with_logger(NullLogger()) do 
     append_generated_quantities(trace, generated_quantities(model, trace))
 end
-@info @sprintf("Minimum Neff_sel = %.1f, 4*nobs = %d", minimum(trace[:Neff_sel]), 4*sum(mask))
+@info @sprintf("Minimum Neff_sel = %.1f, 4*nobs = %d", minimum(trace[:Neff_sel]), 4*length(narrow_gwnames))
 @info @sprintf("Minimum Neff_samps = %.1f", minimum([minimum(trace[n]) for n in namesingroup(trace, :Neff_samps)]))
 
 idata = from_mcmcchains(trace, coords=Dict(:gwnames => narrow_gwnames), dims=(Neff_samps=(:gwnames,), m1s_popwt=(:gwnames,), m2s_popwt=(:gwnames,)), library="Turing")

@@ -46,23 +46,23 @@
     effects in this sample are hard to quantify \todo{Check this!}.  Binary
     black hole mergers detected from gravitational waves in the GWTC-3 transient
     catalog furnish a large sample of several tens of low-mass black holes with
-    a well-understood selection function.  Here we analyze the 15 GWTC-3 merger
-    events with black hole masses in $3 \, M_\odot < m_2 < m_1 < 20 \, M_\odot$
-    in detail to uncover the structure of the low-mass black hole mass function
-    in these systems.  Using several flexible parameterized models for the mass
-    function, we find a sharp peak (width $\lesssim 20\%$) in the mass function
-    at $m = \mpeakplgplpunits$, associated with merger rates $m_1 m_2 \mathrm{d}
-    N / \mathrm{d} m_1 \mathrm{d} m_2 \mathrm{d} V \mathrm{d} t =
-    \dNlogmpeakunits$.  The mass function falls by at least an order of
-    magnitude both below and above this peak.  Toward the lowest masses, the
-    mass function may or may not flatten; we find that the $1\%$ black hole mass
-    in our most flexible model is $m_{1\%} = \monepctplgplpunits$. In other
-    words, this sample of low-mass black holes does not require a mass gap but
-    may permit one; observations in the currently-ongoing ``O4'' observation run
-    should distinguish these possibilities.  Toward higher masses, the mass
-    function declines to our upper limit $m = 20 \, M_\odot$ steeply, with power
-    law slopes $\mathrm{d} N / \mathrm{d} m \sim m^{-\alpha}$, $\alpha =
-    \alphatwoplgplp$.  The presence of a peak at $m \sim 9 \, M_\odot$ is
+    a well-understood selection function.  Here we analyze the \nevts{} GWTC-3
+    merger events with at least one black hole ($3 \, M_\odot < m_1$) and chirp
+    masses below those of a $20\,M_\odot$--$20\,M_\odot$ merger ($M_c <
+    \mchighunits$) to uncover the structure of the low-mass black hole mass
+    function in these systems.  Using flexible parameterized models for the mass
+    function, we find a sharp peak in the mass function at $m =
+    \mpeakplgplpunits$, associated with merger rates $m_1 m_2 \mathrm{d} N /
+    \mathrm{d} m_1 \mathrm{d} m_2 \mathrm{d} V \mathrm{d} t = \dNlogmpeakunits$.
+    The mass function falls by about an order of magnitude both below and above
+    this peak.  Toward the lowest masses, the mass function may or may not
+    flatten; we find that the $1\%$ black hole mass in our most flexible model
+    is $m_{1\%} = \monepctplgplpunits$. In other words, this sample of low-mass
+    black holes does not require a mass gap but may permit one; observations in
+    the currently-ongoing ``O4'' observation run should distinguish these
+    possibilities.  Toward higher masses, the mass function declines steeply,
+    with power law slopes $\mathrm{d} N / \mathrm{d} m \sim m^{\alpha}$, $\alpha
+    = \alphatwoplgplp$.  The presence of a peak at $m \sim 9 \, M_\odot$ is
     suggested by several models of stellar evolution.
 \end{abstract}
 
@@ -105,10 +105,8 @@ pairing function\footnote{We also explored Gaussian pairing functions,
     g\left(m_1, m_2 \right) \propto \exp\left( - \left( m_2/m_1 - \mu_q \right)^2 /
 \left( 2 \sigma_q^2 \right) \right);
 \end{equation} 
-fits incorporating this pairing function form are available in the data release
-associated with this paper, but because the qualitative results from these fits
-are identical to fits to power-law pairing functions, we do not discuss them
-further here.}.  The parameter $f_g$ is the fraction of the merger rate at $m_1
+but found no qualitative and few quantitative differences with the results
+reported here.}.  The parameter $f_g$ is the fraction of the merger rate at $m_1
 = m_2 = \mu$ that is in the Gaussian component of the mass function.  When
 normalizing the ``common'' mass function $f$ to be a probability distribution
 for $m_\mathrm{low} \leq m \leq m_\mathrm{high}$ we will write 
@@ -123,7 +121,7 @@ for $m_\mathrm{low} \leq m \leq m_\mathrm{high}$ we will write
     for the primary and secondary black hole masses in the events considered in
     this analysis.  The contours show credible regions containing $50\%$ and
     $90\%$ of the likelihood for each event.  The dashed lines show our
-    selection cuts, with $m_2 > 3 \, M_\odot$ and $\mclowunits < M_c <
+    selection cuts, with $m_1 > 3 \, M_\odot$ and $M_c <
     \mchighunits$.}
 \end{figure}
 
@@ -159,6 +157,12 @@ for $m_\mathrm{low} \leq m \leq m_\mathrm{high}$ we will write
 \end{figure}
 
 \input{table1_content.tex}
+
+\begin{acknowledgments}
+    We thank Jeff Andrews for comments on an early version of this work.
+\end{acknowledgments}
+
+\software{\texttt{zenodo-get} \citep{Volgyes2020}}
 
 \clearpage
 

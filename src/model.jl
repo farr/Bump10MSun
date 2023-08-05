@@ -26,6 +26,12 @@ const mref = 10.0
 criterion to be included in this study."""
 const default_selection_fraction = 0.5
 
+"""Our threshold on false alarm rate."""
+const far_threshold = 1.0 # far < 1 / yr is our selection criterion
+
+"""Our threshold on the SNR for the O1/O2 semianalytic injecions."""
+const snr_threshold = 9.0
+
 """Below this mass, use NS mass function; above, BH."""
 const mmax_ns = 3.0
 

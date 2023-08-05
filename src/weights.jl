@@ -89,7 +89,9 @@ function read_selection(file)
         # p(m1, m2, z, s1, s1) / p(s1) / p(s2) / T => p(m1, m2, z, t)
         pdraw = pm1m2zs1s2 ./ T ./ pxyz1 ./ pxyz2
 
-        sel_flag = (read(i, "ifar_cwb") .> 1) .| (read(i, "ifar_gstlal") .> 1) .| (read(i, "ifar_mbta") .> 1) .| (read(i, "ifar_pycbc_bbh") .> 1) .| (read(i, "ifar_pycbc_hyperbank") .> 1)
+        sel_flag_o3 = (read(i, "name") == "o3") .& ((read(i, "ifar_cwb") .> 1/far_threshold) .| (read(i, "ifar_gstlal") .> 1/far_threshold) .| (read(i, "ifar_mbta") .> 1/far_threshold) .| (read(i, "ifar_pycbc_bbh") .> 1/far_threshold) .| (read(i, "ifar_pycbc_hyperbank") .> 1/far_threshold))
+        sel_flag_o1o2 = (read(i, "name") !== "o3") .& (read(i, "optimal_snr_net") .> snr_threshold)
+        sel_flag = sel_flag_o3 .| sel_flag_o1o2
     
         Ndraw = round(Int, read(attributes(i)["total_generated"]))
     

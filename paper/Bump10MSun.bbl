@@ -9,4 +9,8 @@
 {Fishbach}, M., \& {Holz}, D.~E. 2020, \apjl, 891, L27,
   \dodoi{10.3847/2041-8213/ab7247}
 
+\bibitem[{V\"{o}lgyes(2020)}]{Volgyes2020}
+V\"{o}lgyes, D. 2020, Zenodo\_get: a downloader for Zenodo records.,
+  \dodoi{10.5281/zenodo.1261812}
+
 \end{thebibliography}

@@ -23,6 +23,7 @@ include("model.jl")
 export mlow, mhigh, zref, mclow, mchigh
 export m_lower_limit, m_upper_limit
 export isselected, default_selection_fraction
+export far_threshold
 export MassFunction, BrokenPowerLaw, PowerLawGaussian
 export PairingFunction, GaussianPairing, PowerLawPairing
 export model_body
@@ -42,6 +43,7 @@ export pf_label_map, pf_var_name_map
 export distribution_quantile
 export bisect
 export hdi_interval
+export logscale_ticks
 
 include("weights.jl")
 export li_prior_wt, md_sfr, md_sfr_zwt, read_selection
@@ -52,5 +54,6 @@ export with_seed, append_generated_quantities
 export cumtrapz
 export load_pe_samples
 export chirp_mass
+export filter_selected
 
 end # module

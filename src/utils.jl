@@ -54,9 +54,15 @@ function load_pe_samples(dirname, glob_pattern, dataset_key)
     samps = []
     fnames = []
     for fn in glob(glob_pattern, dirname)
-        h5open(fn, "r") do f
-            push!(samps, read(f, dataset_key))
-            push!(fnames, fn)
+        try
+            h5open(fn, "r") do f
+                push!(samps, read(f, dataset_key))
+                push!(fnames, fn)
+            end
+        catch e
+            if isa(e, KeyError)
+                @warn "file $(fn) does not contain $(dataset_key); skipping"
+            end
         end
     end
     gwnames = [String(match(r"^.*(GW[0-9]+[_]*[0-9]*).*$", f)[1]) for f in fnames]
@@ -74,4 +80,38 @@ function chirp_mass(m1, m2)
     eta = m1*m2/(mt*mt)
 
     mt*eta^(3/5)
+end
+
+function filter_selected(samps, fnames, gwnames, table)
+    mask = map(samps) do ss
+        m1s = [x.mass_1_source for x in ss]
+        m2s = [x.mass_2_source for x in ss]
+    
+        sel = isselected.(m1s, m2s)
+        sum(sel) > default_selection_fraction*length(sel)
+    end
+    samps = samps[mask]
+    fnames = fnames[mask]
+    gwnames = gwnames[mask]
+
+    mask = map(gwnames) do n
+        exact_equals = [tn == n for tn in table[!, :commonName]]
+        contains = [occursin(tn, n) for tn in table[!, :commonName]]
+        if any(exact_equals)
+            row = table[exact_equals, :][1, :]
+            return row.far < far_threshold
+        elseif any(contains)
+            row = table[contains, :][1, :]
+            return row.far < far_threshold
+        else
+            @warn "could not find event $(n) in table"
+            return false
+        end
+    end
+
+    samps = samps[mask]
+    fnames = fnames[mask]
+    gwnames = gwnames[mask]
+
+    return samps, fnames, gwnames
 end
