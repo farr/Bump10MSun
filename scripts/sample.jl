@@ -28,7 +28,7 @@ s = ArgParseSettings()
         arg_type = Int
     "--nsel"
         help = "Number of detected injections to use to estimate the selection normalization"
-        default = 4096
+        default = 6500
         arg_type = Int
     "--model"
         help = "Model to fit, one of [broken_pl, two_broken_pl, broken_pl_plp, two_broken_pl_plp]"
@@ -43,6 +43,9 @@ s = ArgParseSettings()
         help = "RNG seed"
         default = 8572587030709747370
         arg_type = Int
+    "--extra-events"
+        help = "Include by hand extra events"
+        action = :store_true
 end
 
 parsed_args = parse_args(s)
@@ -70,7 +73,11 @@ else
     error("--model argument must be one of $(keys(model_functions)); got $(parsed_args["model"])")
 end
 
-log_dN_default = make_log_dN(PowerLawGaussian(), PowerLawPairing(), 3.2, -2.2, 9.8, 1.6, 0.77, -1.7, 0.14, 1.1, 0.94)
+if parsed_args["extra-events"]
+    suffix = suffix * "_extra"
+end
+
+log_dN_default = make_log_dN(PowerLawGaussian(), PowerLawPairing(), -1.5, -0.85, 9.7, 1.1, 0.55, 4.4, 4.6, 1.1, 1.9)
 
 sampso3a, fnameso3a, gwnameso3a = load_pe_samples("/Users/wfarr/Research/gwtc-2.1", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
 sampso3b, fnameso3b, gwnameso3b = load_pe_samples("/Users/wfarr/Research/o3b_data/PE", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
@@ -81,6 +88,16 @@ fnames = vcat(fnameso3a, fnameso3b)
 gwnames = vcat(gwnameso3a, gwnameso3b)
 
 narrow_samps, narrow_fnames, narrow_gwnames = filter_selected(samps, fnames, gwnames, gwtc3_table)
+
+if parsed_args["extra-events"]
+    df = DataFrame(CSV.File("/Users/wfarr/Downloads/Exp0_pesummary.dat.txt"))
+
+    nt_array = [(mass_1_source=m1, mass_2_source=m2, redshift=z) for (m1, m2, z) in zip(df[:, :mass_1_source], df[:, :mass_2_source], df[:, :redshift])]
+
+    push!(narrow_samps, nt_array)
+    push!(narrow_fnames, "Exp0_pesummary.dat.txt")
+    push!(narrow_gwnames, "S230529ay")
+end
 
 @info "Analyzing $(length(narrow_gwnames)) events:"
 for n in narrow_gwnames

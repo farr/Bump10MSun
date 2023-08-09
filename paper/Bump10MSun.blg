@@ -4,44 +4,44 @@ The top-level auxiliary file: Bump10MSun.aux
 The style file: aasjournal.bst
 Database file #1: Bump10MSun.bib
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
-You've used 2 entries,
+You've used 3 entries,
             3168 wiz_defined-function locations,
-            666 strings with 4942 characters,
-and the built_in function-call counts, 692 in all, are:
-= -- 60
-> -- 34
-< -- 2
-+ -- 11
-- -- 10
-* -- 49
-:= -- 132
-add.period$ -- 2
-call.type$ -- 2
-change.case$ -- 9
-chr.to.int$ -- 2
-cite$ -- 2
-duplicate$ -- 30
-empty$ -- 50
-format.name$ -- 15
-if$ -- 136
+            676 strings with 5089 characters,
+and the built_in function-call counts, 1089 in all, are:
+= -- 97
+> -- 56
+< -- 3
++ -- 18
+- -- 17
+* -- 81
+:= -- 202
+add.period$ -- 3
+call.type$ -- 3
+change.case$ -- 14
+chr.to.int$ -- 3
+cite$ -- 3
+duplicate$ -- 47
+empty$ -- 77
+format.name$ -- 26
+if$ -- 219
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 1
-newline$ -- 14
-num.names$ -- 8
-pop$ -- 8
+missing$ -- 2
+newline$ -- 17
+num.names$ -- 12
+pop$ -- 14
 preamble$ -- 1
-purify$ -- 9
+purify$ -- 14
 quote$ -- 0
-skip$ -- 27
+skip$ -- 41
 stack$ -- 0
-substring$ -- 24
+substring$ -- 41
 swap$ -- 0
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 18
+type$ -- 27
 warning$ -- 0
-while$ -- 7
+while$ -- 11
 width$ -- 0
-write$ -- 28
+write$ -- 39

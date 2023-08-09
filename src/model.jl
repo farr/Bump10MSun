@@ -5,7 +5,7 @@ const mlow = 3.0
 const m_lower_limit = 1.0
 
 """The upper limit of the mass function used in integrals."""
-const m_upper_limit = 50.0
+const m_upper_limit = 40.0
 
 """The maximum mass for plotting."""
 const mhigh = 20.0
