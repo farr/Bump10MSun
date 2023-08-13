@@ -174,3 +174,12 @@ function bounded_kde_pdf(xs::AbstractArray; low=nothing, high=nothing)
     end
     mypdf
 end
+
+"""
+    categorical_palette(n)
+
+Return a palette of `n` distinguishable colors.
+"""
+function categorical_palette(n)
+    distinguishable_colors(n, [RGB(1,1,1), RGB(0,0,0)], dropseed=true)
+end
