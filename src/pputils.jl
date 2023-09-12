@@ -174,3 +174,12 @@ function bounded_kde_pdf(xs::AbstractArray; low=nothing, high=nothing)
     end
     mypdf
 end
+
+"""
+    categorical_palette(n; luminence=50, chroma=90)
+
+Return a palette of `n` distinguishable colors.
+"""
+function categorical_palette(n; luminence=50, chroma=90)
+    [LCHuv(luminence, chroma, 360*(i-1/2)/n) for i in 1:n]
+end

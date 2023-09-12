@@ -3,5 +3,7 @@
 *.fls
 *.log
 *.out
+*.bbl
+*.blg
 Bump10MSun.pdf
 *.synctex.gz
