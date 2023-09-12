@@ -1,5 +1,6 @@
 module Bump10MSun
 
+using ColorTypes
 using Cosmology
 using Distributions
 using GaussianKDEs
@@ -44,6 +45,7 @@ export distribution_quantile
 export bisect
 export hdi_interval
 export logscale_ticks
+export categorical_palette
 
 include("weights.jl")
 export li_prior_wt, md_sfr, md_sfr_zwt, read_selection

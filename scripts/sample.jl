@@ -24,7 +24,7 @@ s = ArgParseSettings()
         arg_type = Int
     "--npost"
         help = "Number of posterior samples to draw"
-        default = 256
+        default = 512
         arg_type = Int
     "--nsel"
         help = "Number of detected injections to use to estimate the selection normalization"
@@ -90,12 +90,12 @@ gwnames = vcat(gwnameso3a, gwnameso3b)
 narrow_samps, narrow_fnames, narrow_gwnames = filter_selected(samps, fnames, gwnames, gwtc3_table)
 
 if parsed_args["extra-events"]
-    df = DataFrame(CSV.File("/Users/wfarr/Downloads/Exp0_pesummary.dat.txt"))
+    df = DataFrame(CSV.File("/Users/wfarr/Research/o4a_data/pe/S230529ay/EXP6_pesummary.dat.gz"))
 
     nt_array = [(mass_1_source=m1, mass_2_source=m2, redshift=z) for (m1, m2, z) in zip(df[:, :mass_1_source], df[:, :mass_2_source], df[:, :redshift])]
 
     push!(narrow_samps, nt_array)
-    push!(narrow_fnames, "Exp0_pesummary.dat.txt")
+    push!(narrow_fnames, "Exp6_pesummary.dat.gz")
     push!(narrow_gwnames, "S230529ay")
 end
 
