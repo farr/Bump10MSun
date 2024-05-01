@@ -1,6 +1,7 @@
 module Bump10MSun
 
 using ColorTypes
+using Colors
 using Cosmology
 using Distributions
 using GaussianKDEs
