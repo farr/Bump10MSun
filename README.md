@@ -21,14 +21,17 @@ Install Julia from [julialang.org](https://julialang.org/downloads/).
 Clone this repository.
 
 Instantiate the necessary Julia environment: 
+
 1. Start Julia.
+
 2. Instantiate the Julia environment.  For now you will also have to manually
    (re)add the [PopModels.jl](https://github.com/farr/PopModels.jl) package, as
    it is not yet listed in the General Julia registry.  Push `]` to enter the
-   package manager mode, and issue the command `add
-   https://github.com/farr/PopModels.jl`.  Now that the PopModels.jl package is
-   registered, you can instantiate the environment by issuing the `instantiate`
-   command.
+   package manager mode, activate the current directory with `activate .`, and
+   issue the command `add https://github.com/farr/PopModels.jl`.  Now that the
+   PopModels.jl package is registered, you can instantiate the environment by
+   issuing the `instantiate` command.
+
 3. You should now have a working `Bump10MSun` environment, and can:
     - Re-run the MCMC sampling of the various population models using the
       `scripts/sample.jl` script (artisinal) or resample all the models using
