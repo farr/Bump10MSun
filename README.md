@@ -39,7 +39,7 @@ Instantiate the necessary Julia environment:
     - Examine and adapt the population models in `src/model.jl` if you would
       prefer to change the "common" mass function or the pairing function.
     - Regenerate plots numbers, etc that appear in the paper draft / sketch
-      using the notebook at `notebooks/PaperPlotsTablesMacros.ipynb`.
+      using the notebook at `scripts/plots_tables_macros.jl`.
     - Edit and/or recompile the paper LaTeX in `paper` using `latexmk` or
       similar.  (Note that a PDF of the paper is compiled automatically at
       GitHub via CI actions if you push a branch.)
