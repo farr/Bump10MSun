@@ -1,2 +1,6 @@
 **/*.h5 filter=lfs diff=lfs merge=lfs -text
 **/*.nc filter=lfs diff=lfs merge=lfs -text
+chains/chain_bplg_including_230529.nc filter=lfs diff=lfs merge=lfs -text
+chains/chain_bplg.nc filter=lfs diff=lfs merge=lfs -text
+chains/chain_bpl_including_230529.nc filter=lfs diff=lfs merge=lfs -text
+chains/chain_bpl.nc filter=lfs diff=lfs merge=lfs -text

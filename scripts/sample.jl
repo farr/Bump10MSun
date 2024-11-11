@@ -14,6 +14,7 @@ using Printf
 using Random
 using StatsBase
 using Turing
+using NCDatasets
 
 s = ArgParseSettings()
 
@@ -43,6 +44,11 @@ s = ArgParseSettings()
         help = "RNG seed"
         default = 8572587030709747370
         arg_type = Int
+
+    "--o4a"
+	help = "Whether or not to include GW230529"
+        default = false
+        arg_type = Bool
 end
 
 parsed_args = parse_args(s)
@@ -72,15 +78,26 @@ end
 
 log_dN_default = make_log_dN(PowerLawGaussian(), PowerLawPairing(), 3.2, -2.2, 9.8, 1.6, 0.77, -1.7, 0.14, 1.1, 0.94)
 
-sampso3a, fnameso3a, gwnameso3a = load_pe_samples("/Users/wfarr/Research/gwtc-2.1", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
-sampso3b, fnameso3b, gwnameso3b = load_pe_samples("/Users/wfarr/Research/o3b_data/PE", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
-gwtc3_table = DataFrame(CSV.File("/Users/wfarr/Research/gwtc-3-tables/GWTC.csv"))
+sampso3a, fnameso3a, gwnameso3a = load_pe_samples("../../o3a", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
+sampso3b, fnameso3b, gwnameso3b = load_pe_samples("../../o3b", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
 
-samps = vcat(sampso3a, sampso3b)
-fnames = vcat(fnameso3a, fnameso3b)
-gwnames = vcat(gwnameso3a, gwnameso3b)
+if parsed_args["o4a"]
+  gwtc_table = DataFrame(CSV.File("../../GWTC-up.csv"))
 
-narrow_samps, narrow_fnames, narrow_gwnames = filter_selected(samps, fnames, gwnames, gwtc3_table)
+  sampso4a, fnameso4a, gwnameso4a = load_pe_samples("../../o4a", "*GW*_nocosmo.h5", "Combined_PHM_highSpin/posterior_samples")
+  samps = vcat(sampso3a, sampso3b, sampso4a)
+  fnames = vcat(fnameso3a, fnameso3b, fnameso4a)
+  gwnames = vcat(gwnameso3a, gwnameso3b, gwnameso4a)
+else
+  gwtc_table = DataFrame(CSV.File("../../GWTC.csv"))
+
+
+  samps = vcat(sampso3a, sampso3b)
+  fnames = vcat(fnameso3a, fnameso3b)
+  gwnames = vcat(gwnameso3a, gwnameso3b)
+end
+
+narrow_samps, narrow_fnames, narrow_gwnames = filter_selected(samps, fnames, gwnames, gwtc_table)
 
 @info "Analyzing $(length(narrow_gwnames)) events:"
 for n in narrow_gwnames
@@ -109,7 +126,7 @@ m1s = [[xs[i].mass_1_source for i in is] for (xs, is) in zip(narrow_samps, inds)
 m2s = [[xs[i].mass_2_source for i in is] for (xs, is) in zip(narrow_samps, inds)]
 log_wts = [[log(w[i]) for i in is] for (w, is) in zip(pop_wts, inds)]
 
-m1s_sel, m2s_sel, zs_sel, pdraw, Ndraw = read_selection("/Users/wfarr/Research/o3b_data/O1O2O3-Sensitivity/o1+o2+o3_mixture_real+semianalytic-LIGO-T2100377-v2.hdf5")
+m1s_sel, m2s_sel, zs_sel, pdraw, Ndraw = read_selection("../../o1+o2+o3_mixture_real+semianalytic-LIGO-T2100377-v2.hdf5")
 pdraw = pdraw ./ (md_sfr_zwt.(zs_sel) ./ md_sfr(zref))
 m1s_sel, m2s_sel, pdraw, Ndraw = resample_selection(log_dN_default, m1s_sel, m2s_sel, pdraw, Ndraw)
 @info "Number of resampled selection function samples = $(Ndraw)"
@@ -135,4 +152,7 @@ end
 
 idata = from_mcmcchains(trace, coords=Dict(:gwnames => narrow_gwnames), dims=(Neff_samps=(:gwnames,), m1s_popwt=(:gwnames,), m2s_popwt=(:gwnames,)), library="Turing")
 
+if parsed_args["o4a"]
+  suffix = suffix*"_including_230529"
+end
 to_netcdf(idata, joinpath(@__DIR__, "..", "chains", "chain" * suffix * ".nc"))

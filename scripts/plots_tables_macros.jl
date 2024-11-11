@@ -16,6 +16,17 @@ using Random
 using StatsBase
 using StatsFuns
 using Trapz
+using ArgParse
+
+s = ArgParseSettings()
+@add_arg_table s begin
+    "--o4a"
+        help = "Whether or not to include GW230529"
+        default = false
+        arg_type = Bool
+end
+
+parsed_args = parse_args(s)
 
 # Set the theme---each of these "sections" and plots are wrapped in a begin ...
 # end block so that you can run the whole thing within VSCode with a single
@@ -31,23 +42,40 @@ end
 
 # Load the Data
 begin
-    sampso3a, fnameso3a, gwnameso3a = load_pe_samples("/Users/wfarr/Research/gwtc-2.1/", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
-    sampso3b, fnameso3b, gwnameso3b = load_pe_samples("/Users/wfarr/Research/o3b_data/PE", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
-    gwtc3_table = DataFrame(CSV.File("/Users/wfarr/Research/gwtc-3-tables/GWTC.csv"))
+    sampso3a, fnameso3a, gwnameso3a = load_pe_samples("../../o3a", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
+    sampso3b, fnameso3b, gwnameso3b = load_pe_samples("../../o3b", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
+    if parsed_args["o4a"]
+      gwtc_table = DataFrame(CSV.File("../../GWTC-up.csv"))
 
-    samps = vcat(sampso3a, sampso3b)
-    fnames = vcat(fnameso3a, fnameso3b)
-    gwnames = vcat(gwnameso3a, gwnameso3b)
+      sampso4a, fnameso4a, gwnameso4a = load_pe_samples("../../o4a", "*GW*_nocosmo.h5", "Combined_PHM_highSpin/posterior_samples")
+      samps = vcat(sampso3a, sampso3b, sampso4a)
+      fnames = vcat(fnameso3a, fnameso3b, fnameso4a)
+      gwnames = vcat(gwnameso3a, gwnameso3b, gwnameso4a)
+    else
+      gwtc_table = DataFrame(CSV.File("../../GWTC.csv"))
 
-    samps, fnames, gwnames = filter_selected(samps, fnames, gwnames, gwtc3_table)
+
+      samps = vcat(sampso3a, sampso3b)
+      fnames = vcat(fnameso3a, fnameso3b)
+      gwnames = vcat(gwnameso3a, gwnameso3b)
+    end
+
+    samps, fnames, gwnames = filter_selected(samps, fnames, gwnames, gwtc_table)
     @info "Analyzing $(length(gwnames)) events:"
     for n in gwnames
         @info "  $(n)"
     end
 end
 
+if parsed_args["o4a"]
+  new_suffix = "_including_230529"
+else
+  new_suffix = ""
+end
+
+
 # Load the MCMC samples
-traces = Dict(k => from_netcdf(joinpath(@__DIR__, "..", "chains", "chain" * suffix_map[k] * ".nc")) for k in keys(suffix_map))
+traces = Dict(k => from_netcdf(joinpath(@__DIR__, "..", "chains", "chain" * suffix_map[k] * new_suffix * ".nc")) for k in keys(suffix_map))
 
 # Compute various distributional quantities for the MCMC samples
 begin
@@ -138,7 +166,7 @@ begin
     m2s = [bisect(m2 -> chirp_mass(m1, m2)-mchigh, 0, m_upper_limit) for m1 in m1s]
     band!(a, m1s, m2s, m1s, color=(:grey, 0.5), label=nothing)
 
-    save(joinpath(@__DIR__, "..", "paper", "figures", "m1-m2-contour.pdf"), f)
+    save(joinpath(@__DIR__, "..", "paper", "figures", "m1-m2-contour" * new_suffix * ".pdf"), f)
     f
 end
 
@@ -166,7 +194,7 @@ begin
 
     axislegend(a1, position=:rb)
 
-    save(joinpath(@__DIR__, "..", "paper", "figures", "dNdm_traces.pdf"), f)
+    save(joinpath(@__DIR__, "..", "paper", "figures", "dNdm_traces" * new_suffix * ".pdf"), f)
     f
 end
 
@@ -191,7 +219,7 @@ begin
 
     axislegend(a, position=:lt)
 
-    save(joinpath(@__DIR__, "..", "paper", "figures", "pm_traces.pdf"), f)
+    save(joinpath(@__DIR__, "..", "paper", "figures", "pm_traces" * new_suffix * ".pdf"), f)
     f
 end
 
@@ -210,7 +238,7 @@ begin
 
     axislegend(a, position=:rt)
 
-    save(joinpath(@__DIR__, "..", "paper", "figures", "m1pct.pdf"), f)
+    save(joinpath(@__DIR__, "..", "paper", "figures", "m1pct" * new_suffix * ".pdf"), f)
     f
 end
 
@@ -221,22 +249,22 @@ begin
         write(f, s)
     end
 
-    open(joinpath(@__DIR__, "..", "paper", "result_macros.tex"), "w") do f
-        write_macro(f, result_macro(raw"\dNlogmpeak", raw"\mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", traces[PowerLawGaussian(), PowerLawPairing()].posterior.R, digits=0))
-        write_macro(f, result_macro(raw"\monepctplgplp", raw"M_\odot", m1pcts[PowerLawGaussian(), PowerLawPairing()], digits=2))
-        write_macro(f, result_macro(raw"\mpeakplgplp", raw"M_\odot", traces[PowerLawGaussian(), PowerLawPairing()].posterior.mu, digits=2))
-        write_macro(f, result_macro(raw"\alphatwoplgplp", traces[PowerLawGaussian(), PowerLawPairing()].posterior.a2, digits=1))
-        write_macro(f, "\\newcommand{\\mlow}{$(mlow)}\n\\newcommand{\\mlowunits}{\\ensuremath{\\mlow \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mclow}{$(mclow)}\n\\newcommand{\\mclowunits}{\\ensuremath{\\mclow \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mchigh}{$(mchigh)}\n\\newcommand{\\mchighunits}{\\ensuremath{\\mchigh \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mhigh}{$(mhigh)}\n\\newcommand{\\mhighunits}{\\ensuremath{\\mhigh \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\nevts}{$(length(gwnames))}")
+    open(joinpath(@__DIR__, "..", "paper", "result_macros" * new_suffix * ".tex"), "w") do f
+        write_macro(f, result_macro(raw"\dNlogmpeak" * new_suffix, raw"\mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", traces[PowerLawGaussian(), PowerLawPairing()].posterior.R, digits=0))
+        write_macro(f, result_macro(raw"\monepctplgplp" * new_suffix , raw"M_\odot", m1pcts[PowerLawGaussian(), PowerLawPairing()], digits=2))
+        write_macro(f, result_macro(raw"\mpeakplgplp" * new_suffix, raw"M_\odot", traces[PowerLawGaussian(), PowerLawPairing()].posterior.mu, digits=2))
+        write_macro(f, result_macro(raw"\alphatwoplgplp" * new_suffix, traces[PowerLawGaussian(), PowerLawPairing()].posterior.a2, digits=1))
+        write_macro(f, "\\newcommand{\\mlow" * new_suffix * "}{$(mlow)}\n\\newcommand{\\mlowunits}{\\ensuremath{\\mlow \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mclow" * new_suffix *"}{$(mclow)}\n\\newcommand{\\mclowunits}{\\ensuremath{\\mclow \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mchigh" * new_suffix * "}{$(mchigh)}\n\\newcommand{\\mchighunits}{\\ensuremath{\\mchigh \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mhigh" * new_suffix * "}{$(mhigh)}\n\\newcommand{\\mhighunits}{\\ensuremath{\\mhigh \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\nevts" * new_suffix * "}{$(length(gwnames))}")
     end
 end
 
 # Table 1
 begin
-    open(joinpath(@__DIR__, "..", "paper", "table1_content.tex"), "w") do f
+    open(joinpath(@__DIR__, "..", "paper", "table1_content" * new_suffix * ".tex"), "w") do f
         write(f, "\\begin{deluxetable}{llll}\n\\tablecolumns{3}\n\\tablecaption{\\label{tab:monepct} \$m_{1\\%}\$ for our various models and using different selection functions.}\n")
         write(f, "\\tablehead{\\colhead{Mass Function Model} & \\colhead{\$m_{1\\%} / M_\\odot\$ (1-\$\\sigma\$, 68\\%)} & \\colhead{\$m_{1\\%} / M_\\odot\$ range (2-\$\\sigma\$, 95\\%)}}\n")
         write(f, "\\startdata\n")
