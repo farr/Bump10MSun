@@ -256,10 +256,10 @@ begin
         write_macro(f, result_macro(raw"\monepctplgplp" * new_suffix_tex , raw"M_\odot", m1pcts[PowerLawGaussian(), PowerLawPairing()], digits=2))
         write_macro(f, result_macro(raw"\mpeakplgplp" * new_suffix_tex, raw"M_\odot", traces[PowerLawGaussian(), PowerLawPairing()].posterior.mu, digits=2))
         write_macro(f, result_macro(raw"\alphatwoplgplp" * new_suffix_tex, traces[PowerLawGaussian(), PowerLawPairing()].posterior.a2, digits=1))
-        write_macro(f, "\\newcommand{\\mlow" * new_suffix_tex * "}{$(mlow)}\n\\newcommand{\\mlowunits}{\\ensuremath{\\mlow \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mclow" * new_suffix_tex *"}{$(mclow)}\n\\newcommand{\\mclowunits}{\\ensuremath{\\mclow \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mchigh" * new_suffix_tex * "}{$(mchigh)}\n\\newcommand{\\mchighunits}{\\ensuremath{\\mchigh \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mhigh" * new_suffix_tex * "}{$(mhigh)}\n\\newcommand{\\mhighunits}{\\ensuremath{\\mhigh \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mlow" * new_suffix_tex * "}{$(mlow)}\n\\newcommand{\\mlowunits" * new_suffix_tex * "}{\\ensuremath{\\mlow \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mclow" * new_suffix_tex *"}{$(mclow)}\n\\newcommand{\\mclowunits" * new_suffix_tex * "}{\\ensuremath{\\mclow \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mchigh" * new_suffix_tex * "}{$(mchigh)}\n\\newcommand{\\mchighunits" * new_suffix_tex * "}{\\ensuremath{\\mchigh \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mhigh" * new_suffix_tex * "}{$(mhigh)}\n\\newcommand{\\mhighunits" * new_suffix_tex * "}{\\ensuremath{\\mhigh \\, M_\\odot}}")
         write_macro(f, "\\newcommand{\\nevts" * new_suffix_tex * "}{$(length(gwnames))}")
     end
 end
