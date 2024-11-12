@@ -69,8 +69,10 @@ end
 
 if parsed_args["o4a"]
   new_suffix = "_including_230529"
+  new_suffix_tex = "including230529"
 else
   new_suffix = ""
+  new_suffix_tex = ""
 end
 
 
@@ -250,15 +252,15 @@ begin
     end
 
     open(joinpath(@__DIR__, "..", "paper", "result_macros" * new_suffix * ".tex"), "w") do f
-        write_macro(f, result_macro(raw"\dNlogmpeak" * new_suffix, raw"\mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", traces[PowerLawGaussian(), PowerLawPairing()].posterior.R, digits=0))
-        write_macro(f, result_macro(raw"\monepctplgplp" * new_suffix , raw"M_\odot", m1pcts[PowerLawGaussian(), PowerLawPairing()], digits=2))
-        write_macro(f, result_macro(raw"\mpeakplgplp" * new_suffix, raw"M_\odot", traces[PowerLawGaussian(), PowerLawPairing()].posterior.mu, digits=2))
-        write_macro(f, result_macro(raw"\alphatwoplgplp" * new_suffix, traces[PowerLawGaussian(), PowerLawPairing()].posterior.a2, digits=1))
-        write_macro(f, "\\newcommand{\\mlow" * new_suffix * "}{$(mlow)}\n\\newcommand{\\mlowunits}{\\ensuremath{\\mlow \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mclow" * new_suffix *"}{$(mclow)}\n\\newcommand{\\mclowunits}{\\ensuremath{\\mclow \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mchigh" * new_suffix * "}{$(mchigh)}\n\\newcommand{\\mchighunits}{\\ensuremath{\\mchigh \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mhigh" * new_suffix * "}{$(mhigh)}\n\\newcommand{\\mhighunits}{\\ensuremath{\\mhigh \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\nevts" * new_suffix * "}{$(length(gwnames))}")
+        write_macro(f, result_macro(raw"\dNlogmpeak" * new_suffix_tex, raw"\mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", traces[PowerLawGaussian(), PowerLawPairing()].posterior.R, digits=0))
+        write_macro(f, result_macro(raw"\monepctplgplp" * new_suffix_tex , raw"M_\odot", m1pcts[PowerLawGaussian(), PowerLawPairing()], digits=2))
+        write_macro(f, result_macro(raw"\mpeakplgplp" * new_suffix_tex, raw"M_\odot", traces[PowerLawGaussian(), PowerLawPairing()].posterior.mu, digits=2))
+        write_macro(f, result_macro(raw"\alphatwoplgplp" * new_suffix_tex, traces[PowerLawGaussian(), PowerLawPairing()].posterior.a2, digits=1))
+        write_macro(f, "\\newcommand{\\mlow" * new_suffix_tex * "}{$(mlow)}\n\\newcommand{\\mlowunits}{\\ensuremath{\\mlow \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mclow" * new_suffix_tex *"}{$(mclow)}\n\\newcommand{\\mclowunits}{\\ensuremath{\\mclow \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mchigh" * new_suffix_tex * "}{$(mchigh)}\n\\newcommand{\\mchighunits}{\\ensuremath{\\mchigh \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mhigh" * new_suffix_tex * "}{$(mhigh)}\n\\newcommand{\\mhighunits}{\\ensuremath{\\mhigh \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\nevts" * new_suffix_tex * "}{$(length(gwnames))}")
     end
 end
 
@@ -266,14 +268,15 @@ end
 begin
     open(joinpath(@__DIR__, "..", "paper", "table1_content" * new_suffix * ".tex"), "w") do f
         write(f, "\\begin{deluxetable}{llll}\n\\tablecolumns{3}\n\\tablecaption{\\label{tab:monepct} \$m_{1\\%}\$ for our various models and using different selection functions.}\n")
-        write(f, "\\tablehead{\\colhead{Mass Function Model} & \\colhead{\$m_{1\\%} / M_\\odot\$ (1-\$\\sigma\$, 68\\%)} & \\colhead{\$m_{1\\%} / M_\\odot\$ range (2-\$\\sigma\$, 95\\%)}}\n")
+        write(f, "\\tablehead{\\colhead{Mass Function Model} & \\colhead{\$m_{1\\%} / M_\\odot\$ (90\\%)} & \\colhead{\$m_{1\\%} / M_\\odot\$ range (90\\%)}}\n")
         write(f, "\\startdata\n")
         for mf in [BrokenPowerLaw(), PowerLawGaussian()]
             k = (mf, PowerLawPairing())
             m1p = m1pcts[k]
     
-            m, h, l = median_plus_minus(vec(m1p), 0.68)
-            ll, hh = quantile.((vec(m1p),), [0.025, 0.975])
+            ll, m, hh = hpd(vec(m1p), 0.1)
+	    l = m-ll
+	    h = hh-m
     
             write(f, "\\texttt{" * mf_label_map[mf] * "}")
             write(f, @sprintf("& \$%.2f^{+%.2f}_{-%.2f}\$", m, h-m, m-l))
