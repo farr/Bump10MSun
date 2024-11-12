@@ -69,7 +69,7 @@ end
 
 if parsed_args["o4a"]
   new_suffix = "_including_230529"
-  new_suffix_tex = "including230529"
+  new_suffix_tex = "includingnew"
 else
   new_suffix = ""
   new_suffix_tex = ""
