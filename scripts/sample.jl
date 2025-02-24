@@ -49,6 +49,11 @@ s = ArgParseSettings()
 	help = "Whether or not to include GW230529"
         default = false
         arg_type = Bool
+
+    "--mlow"
+        help = "Minimum mass for event selection"
+	default = nothing
+	arg_type = Float64
 end
 
 parsed_args = parse_args(s)
@@ -58,6 +63,7 @@ Nchain = Threads.nthreads()
 Npost = parsed_args["npost"]
 Nsel = parsed_args["nsel"]
 target_accept = parsed_args["target_accept"]
+m_low = parsed_args["mlow"]
 Random.seed!(parsed_args["seed"])
 
 model_functions = Dict(
@@ -76,28 +82,32 @@ else
     error("--model argument must be one of $(keys(model_functions)); got $(parsed_args["model"])")
 end
 
-log_dN_default = make_log_dN(PowerLawGaussian(), PowerLawPairing(), 3.2, -2.2, 9.8, 1.6, 0.77, -1.7, 0.14, 1.1, 0.94)
+log_dN_default = make_log_dN(PowerLawGaussian(), PowerLawPairing(), 3.2, -2.2, 9.8, 1.6, 0.77, -1.7, 0.14, 1.1, 0.94; m_low = m_low)
+a = log_dN_default(10,3)
 
 sampso3a, fnameso3a, gwnameso3a = load_pe_samples("../../o3a", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
 sampso3b, fnameso3b, gwnameso3b = load_pe_samples("../../o3b", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
+samps190425, fnames190425, gwnames190425 = load_pe_samples("../../o3a", "*GW*_nocosmo.h5", "C01:IMRPhenomPv2_NRTidal:HighSpin/posterior_samples")
+println(gwnames190425)
 
 if parsed_args["o4a"]
   gwtc_table = DataFrame(CSV.File("../../GWTC-up.csv"))
 
   sampso4a, fnameso4a, gwnameso4a = load_pe_samples("../../o4a", "*GW*_nocosmo.h5", "Combined_PHM_highSpin/posterior_samples")
-  samps = vcat(sampso3a, sampso3b, sampso4a)
-  fnames = vcat(fnameso3a, fnameso3b, fnameso4a)
-  gwnames = vcat(gwnameso3a, gwnameso3b, gwnameso4a)
+  
+  samps = vcat(sampso3a, sampso3b, samps190425, sampso4a)
+  fnames = vcat(fnameso3a, fnameso3b, fnames190425, fnameso4a)
+  gwnames = vcat(gwnameso3a, gwnameso3b, gwnames190425, gwnameso4a)
 else
   gwtc_table = DataFrame(CSV.File("../../GWTC.csv"))
 
 
-  samps = vcat(sampso3a, sampso3b)
-  fnames = vcat(fnameso3a, fnameso3b)
-  gwnames = vcat(gwnameso3a, gwnameso3b)
+  samps = vcat(sampso3a, sampso3b, samps190425)
+  fnames = vcat(fnameso3a, fnameso3b, fnames190425)
+  gwnames = vcat(gwnameso3a, gwnameso3b, gwnames190425)
 end
 
-narrow_samps, narrow_fnames, narrow_gwnames = filter_selected(samps, fnames, gwnames, gwtc_table)
+narrow_samps, narrow_fnames, narrow_gwnames = filter_selected(samps, fnames, gwnames, gwtc_table; m_low = m_low)
 
 @info "Analyzing $(length(narrow_gwnames)) events:"
 for n in narrow_gwnames
@@ -137,7 +147,7 @@ m1s_sel = m1s_sel[1:Nsel]
 m2s_sel = m2s_sel[1:Nsel]
 pdraw = pdraw[1:Nsel]
 
-model = model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log.(pdraw), Ndraw)
+model = model(m1s, m2s, log_wts, m1s_sel, m2s_sel, log.(pdraw), Ndraw, m_low = m_low)
 
 if Nchain == 1
     trace = sample(model, NUTS(Nmcmc, target_accept), Nmcmc)
@@ -154,5 +164,8 @@ idata = from_mcmcchains(trace, coords=Dict(:gwnames => narrow_gwnames), dims=(Ne
 
 if parsed_args["o4a"]
   suffix = suffix*"_including_230529"
+end
+if m_low !== nothing
+  suffix = string(suffix*"_", round(m_low; digits = 3))
 end
 to_netcdf(idata, joinpath(@__DIR__, "..", "chains", "chain" * suffix * ".nc"))
