@@ -21,7 +21,7 @@ jobs:
       - name: Run Tectonic
         run: cd paper && tectonic Bump10MSun.tex
       - name: Upload pdf
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Bump10MSun
           path: paper/Bump10MSun.pdf
