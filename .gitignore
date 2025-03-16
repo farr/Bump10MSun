@@ -2,9 +2,17 @@
 .ipynb_checkpoints
 Manifest.toml
 *_2.5*
+!*including*_2.5.nc
+!*including*_2.5.txt
 *_2.75*
+!*including*_2.75.nc
+!*including*_2.75.txt
 *_3.25*
+!*including*_3.25.nc
+!*including*_3.25.txt
 *_3.5*
+!*including*_3.5.nc
+!*including*_3.5.txt
 *_3.0*
 *_2.85*
 *_2.95*
