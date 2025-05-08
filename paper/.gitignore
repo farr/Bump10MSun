@@ -5,3 +5,7 @@
 *.out
 Bump10MSun.pdf
 *.synctex.gz
+*.loc
+*.soc
+*.blg
+*.bbl
