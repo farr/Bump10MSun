@@ -11,7 +11,7 @@
 
 % Comments in the document; change `draft` to `final` to remove comments and
 % incorporate corrected text
-\undef\listofchanges  % aastex also defines this command
+\let\listofchanges\undefined  % aastex also defines this command
 \usepackage[draft,commandnameprefix=always,commentmarkup=uwave]{changes}
 \definechangesauthor[name="Will", color=cyan]{W}
 \definechangesauthor[name="Anarya", color=magenta]{A}
