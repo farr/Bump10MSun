@@ -1,5 +1,6 @@
 using Pkg
 Pkg.activate(joinpath(@__DIR__, ".."))
+using Interpolations
 using Statistics
 using KernelDensity
 
@@ -161,7 +162,7 @@ end
 function distribution_quantile(xs::AbstractVector, ys::AbstractVector, q::Real)
     cfm = cumtrapz(xs, ys)
     cfm .= cfm ./ cfm[end]
-    linear_interpolation(cfm, xs)(q)
+    LinearInterpolation(cfm, xs)(q)
 end
 
 """
