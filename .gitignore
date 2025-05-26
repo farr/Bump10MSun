@@ -14,6 +14,7 @@ Manifest.toml
 !*including*_3.5.nc
 !*including*_3.5.txt
 *_3.0*
+!*result_macros_including_230529_3.0.tex
 *_2.85*
 *_2.95*
 *_4.0*
