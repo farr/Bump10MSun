@@ -129,18 +129,32 @@ begin
             pp
         end for k in keys(traces)
     )
-
+    
+    dNdms = Dict(
+        k => map([traces[k].posterior[v] for v in vcat(mf_var_name_map[k[1]], ns_var_names)]...) do R, args...
+            p = make_dNdm(k[1], args...; m_low = m_low_copy)
+            pp = p.(ms3)
+            pp .= pp ./ trapz(ms3, pp)
+            R .* pp
+        end for k in keys(traces)
+    )
+    dNdmsmlow = Dict(
+		    k => [dNdm[i, j][1] for i in 1:1000, j in 1:4]
+		    for (k,dNdm) in pairs(dNdms)
+    )
     m1pcts = Dict(
         k => [distribution_quantile(ms3, p, 0.01) for p in v]
         for (k,v) in pairs(pms3)
     )
     for (key, value) in pairs(m1pcts)
+	println(key)
 	println(replace(mf_label_map[key[1]], " " => ""))
 	println(size(value))
 	open(joinpath(@__DIR__, "..", "paper", "figures", "m1pct_" * replace(mf_label_map[key[1]], " " => "") * "_" * new_suffix * ".txt"), "w") do io
 	    writedlm(io, vec(value))
         end
     end
+    
 end
 
 # Figure 1
@@ -274,6 +288,7 @@ begin
 
     open(joinpath(@__DIR__, "..", "paper", "result_macros" * new_suffix * ".tex"), "w") do f
         write_macro(f, result_macro(raw"\dNlogmpeak" * new_suffix_tex, raw"\mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", traces[PowerLawGaussian(), PowerLawPairing()].posterior.R, digits=0))
+	write_macro(f, result_macro(raw"\dNlogmmlow" * new_suffix_tex, raw"\mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", dNdmsmlow[PowerLawGaussian(), PowerLawPairing()].* m_low, digits=0))
         write_macro(f, result_macro(raw"\monepctplgplp" * new_suffix_tex , raw"M_\odot", m1pcts[PowerLawGaussian(), PowerLawPairing()], digits=2))
         write_macro(f, result_macro(raw"\mpeakplgplp" * new_suffix_tex, raw"M_\odot", traces[PowerLawGaussian(), PowerLawPairing()].posterior.mu, digits=2))
         write_macro(f, result_macro(raw"\alphatwoplgplp" * new_suffix_tex, traces[PowerLawGaussian(), PowerLawPairing()].posterior.a2, digits=1))
