@@ -8,6 +8,7 @@
 \newcommand{\sbu}{Department of Physics and Astronomy, Stony Brook University, Stony Brook, NY 11794, USA}
 \newcommand{\pa}{Department of Physics and Astronomy, Northwestern University, 2145 Sheridan RD, Evanston, IL 60208, USA}
 \newcommand{\ciera}{Center for Interdisciplinary Exploration and Research in Astrophysics (CIERA), Northwestern University, 1800 Sherman Ave, Evanston, IL 60201, USA}
+\newcommand{\skai}{The NSF-Simons AI Institute for the Sky (NSF-Simons SkAI), 875 N. Michigan Ave., Suite 4010, Chicago, IL 60611}
 
 % Comments in the document; change `draft` to `final` to remove comments and
 % incorporate corrected text
@@ -32,6 +33,7 @@
 \author[0000-0002-7322-4748]{Anarya Ray}
 \email{anarya.ray@northwestern.edu}
 \affiliation{\ciera}
+\affiliation{\skai}
 \author[0000-0003-1540-8562]{Will M. Farr}
 \email{will.farr@stonybrook.edu}
 \email{wfarr@flatironinstitute.org}
@@ -40,34 +42,31 @@
 
 \author[0000-0001-9236-5469]{Vassiliki Kalogera}
 \email{vicky@northwestern.edu}
-\affiliation{\pa}
 \affiliation{\ciera}
+\affiliation{\skai}
+\affiliation{\pa}
 
 \begin{abstract}
-    It is not known whether there is a continum of masses of compact objects
-    formed from stellar collapse from the heaviest neutron stars to the lightest
-    black holes or whether there is a gap in the mass spectrum between these
-    classes of objects.  \chcomment[id=W]{I'm not sure this is really true any
-    more---maybe we should re-word a bit?}  The presence or absence of a mass
+    In recent years, the existence of a gap in the mass spectrum of compact objects
+    formed from stellar collapse, between the heaviest neutron stars and the lightest
+    black holes, has been a matter of significant debate. The presence or absence of a mass
     gap has implications for the supernova mechanism, as well as being a
-    fundamental property of the compact object mass function.  In X-ray binaries
+    fundamental property of the compact object mass function. In X-ray binaries
     containing black holes a gap is observed, but it is not known whether this
     is representative of a true gap in the mass function or due to selection
-    effects or systematic biases in mass estimation.   Binary black hole mergers
+    effects or systematic biases in mass estimation. Binary black hole mergers
     detected from gravitational waves in the GWTC-3 transient catalog furnish a
     large sample of several tens of low-mass black holes with a well-understood
     selection function.  Here we analyze the \nevts{} GWTC-3 merger events
     (along with newly discovered GW230529), with at least one black hole ($3 \,
     M_\odot < m_1$) and chirp masses below those of a
     $20\,M_\odot$--$20\,M_\odot$ merger ($M_c < \mchighunits$) to uncover the
-    structure of the low-mass black hole mass function in these systems.  Using
-    flexible parameterized models for the mass function, we find a sharp peak in
-    the mass function at $m = \mpeakplgplpincludingnewunits$, and a steady
-    decline in merger rate by about an order of magnitude both below and above
-    this peak.  Toward the lowest masses, the mass function may or may not
-    flatten; we find that the $1\%$ black hole mass in our most flexible model
+    structure of the low-mass black hole mass function in these systems. Using
+    flexible parameterized models for the mass function, we find, similar to existing studies, a sharp peak in
+    the mass function at $m \simeq (8-10 M_{\odot})$. In particular, we observe a steady
+    decline in the merger rate by less than an order of magnitude and find that the $1\%$ black hole mass in our most flexible model
     is $m_{1\%} = \monepctplgplpincludingnewunits$. In other words, this sample
-    of low-mass black holes do not require a mass gap.
+    of low-mass black holes does not require a mass gap.
     %     It is not known whether there is a continum of masses of compact objects
     % formed from stellar collapse from the heaviest neutron stars to the lightest
     % black holes or whether there is a gap in the mass spectrum between these
@@ -114,40 +113,35 @@
 %     \item This paper is organized as follows
 % \end{itemize}
 
-The existence of a gap in the compact object mass-spectrum between the lightest black holes and the heaviest neutron stars remains an open question with far-reaching implications. Observational evidence for the presence or absence of a \textit{lower-mass gap} in the population of compact objects formed from stellar collapse can offer new insights into the universal properties of dense matter and the uncertain mechanisms of supernova explosions~\citep{Fryer:2011cx, Mandel:2020qwb, Zevin:2020gma, Liu:2020uba, Patton:2021gwh, Siegel:2022gwc}. In addition, as a fundamental property of the compact object mass spectrum, the lower-mass gap will likely play a vital role in cosmological explorations using gravitational wave~(GW) observations from future detectors~\citep{Ezquiaga:2022zkx}.
+The existence of a gap in the compact object mass-spectrum between the lightest black holes and the heaviest neutron stars remains an open question with far-reaching implications. Observational evidence for the presence or absence of a \textit{lower-mass gap} in the population of compact objects formed from stellar collapse can offer new insights into the universal properties of dense matter and the uncertain mechanisms of supernova explosions~\citep{Fryer:1999ht, Fryer:2011cx, Mandel:2020qwb, Zevin:2020gma, Liu:2020uba, Patton:2021gwh, Siegel:2022gwc}. In addition, as a fundamental property of the compact object mass spectrum, the lower-mass gap will likely play a vital role in cosmological explorations using gravitational wave~(GW) observations from future detectors~\citep{Ezquiaga:2022zkx}.
 
-Several studies relying on electromagnetic observations of low-mass X-ray binaries~(LMXBs) have reported the existence of the lower mass gap~\citep{Bailyn:1997xt, Ozel:2010su, Farr:2010tu}. They have shown that Bayesian inference of phenomenological population models for compact object masses yields a posterior distribution for minimum black-hole mass, which can be constrained given data. Using growing samples of LMXB observations and a variety of mass-distribution models, they have found with 90\% posterior probability that the minimum BH mass is $5M_{\odot}$ or higher, which suggests the existence of a gap between heaviest possible non-rotating NSs~\citep[$2-3M_{\odot}$,][]{PhysRevLett.32.324, Kalogera:1996ci, Mueller:1996pm, Ozel:2016oaf, Margalit_2017, Ai:2019rre, Shao:2020bzt, Raaijmakers:2021uju} and the lightest observed BHs. If true, these findings are indicative of impactful conclusions such as the observational preference of rapid supernova instability time scales~\citep[$\sim 10 ms$,][]{Fryer:2011cx, Belczynski:2011bn, Fryer:2022lla, Siegel:2022gwc} and low mass GW sources dominating the measurability of cosmological parameters from future GW catalogs~\citep{Ezquiaga:2022zkx}.
+Several studies relying on electromagnetic observations of low-mass X-ray binaries~(LMXBs) have reported the existence of the lower mass gap~\citep{Bailyn:1997xt, Ozel:2010su, Farr:2010tu}. They have shown that Bayesian inference of phenomenological population models for compact object masses yields a posterior distribution for minimum black-hole mass, which can be constrained given data. Using growing samples of LMXB observations and a variety of mass-distribution models, they have found with 90\% posterior probability that the minimum BH mass is $\simeq 4.5M_{\odot}$ or higher, which suggests the existence of a gap between the heaviest possible non-rotating NSs~\citep[$2-3M_{\odot}$,][]{PhysRevLett.32.324, Kalogera:1996ci, Mueller:1996pm, Ozel:2016oaf, Margalit_2017, Ai:2019rre, Shao:2020bzt, Raaijmakers:2021uju} and the lightest observed BHs. If true, these findings are indicative of impactful conclusions such as the observational preference of rapid supernova instability time scales~\citep[$\sim 10 ms$,][]{Fryer:2011cx, Belczynski:2011bn, Fryer:2022lla, Siegel:2022gwc} and low mass GW sources dominating the measurability of cosmological parameters from future GW catalogs~\citep{Ezquiaga:2022zkx}.
 
-\chcomment[id=W]{.}
+However, the analyses above are susceptible to several systematic biases, which we summarize as follows. Firstly, various assumptions underlying emission models of accretion flows can significantly bias the measured BH masses, which can in turn affect the conclusions about a gap~\citep{Kreidberg:2012ud}. On the other hand, substantial selection biases can be incurred through the incorrect assumption that every draw from their mass distribution model is equally likely to be observable~\citep{Farr:2010tu, Siegel:2022gwc}. Relying on a forward modeling approach towards LMXB formation, a recent study by \cite{Siegel:2022gwc} has shown that for supernova mechanisms capable of producing BHs in the gap, transient LMXB selection effects can significantly bias the observable sample. Hence, it is unclear whether or not existing LMXB-based measurements of the minimum BH mass can be considered unbiased observational evidence of an existent lower mass gap. The difficulty in modeling transient LMXB selection effects, and the possibility of systematic errors in single source mass measurements, therefore necessitates alternative probes of the compact object mass spectrum to ascertain the existence of a lower mass gap.
 
-% These studies can be broadly classified into two categories depending on their definitions for the minimum BH mass and hence the characteristics of their population models
-
-However, the analyses above are susceptible to several systematic biases, which we summarize as follows. Firstly, various assumptions underlying emission models of accretion flows can significantly bias the measured BH masses which can in turn affect the conclusions about a gap~\citep{Kreidberg:2012ud}. On the other hand, substantial selection biases can be incurred through the incorrect assumption that every draw from their mass distribution model is equally likely to be observable~\citep{Farr:2010tu, Siegel:2022gwc}. Relying on a forward modeling approach towards LMXB formation, a recent study by \cite{Siegel:2022gwc} has shown that for supernova mechanisms capable of producing BHs in the gap, transient LMXB selection effects can significantly bias the observable sample. Hence, it is unclear whether or not existing LMXB-based measurements of the minimum BH mass can be considered unbiased observational evidence of an existent lower mass gap. \textcolor{orange}{The difficulty in modeling transient LMXB selection effects}, and the possibility of systematic errors in single source mass measurements, therefore necessitates alternative probes of the compact object mass spectrum to ascertain the existence of a lower mass gap~\textcolor{orange}{(citation needed)}.
-
-GWs from compact binary coalescences~(CBCs) observed by the LIGO-Virgo-KAGRA~\citep[LVK, ][]{LIGOScientific:2014pky, VIRGO:2014yos, KAGRA:2020agh} detector network offer a novel way to probe the existence of a lower mass gap that is free of such systematic biases~\citep{Farah:2021qom,  LIGOScientific:2024elc, KAGRA:2021duu}. Selection effects in GW observations are well understood and easily modeled through the recovery of simulated sources injected into detector noise realizations~\citep{Thrane:2018qnx,Mandel:2018mve,popgw2,popgw3}, which can then be used to obtain the astrophysical mass distribution of compact objects as compared to the observed distributions inferred by LMXB investigations. Previous studies have attempted this exploration by analyzing all CBC observations~(including NS containing events) using a mass distribution model that allows for a shallow gap~\citep{Farah:2021qom,  KAGRA:2021duu, LIGOScientific:2024elc}. The location, depth, and width of the gap were inferred a posteriori, and Bayesian evidences were computed for values of these parameters that correspond to the presence and absence of a lower gap. 
+Observations of GWs from compact binary coalescences~(CBCs) by the LIGO-Virgo-KAGRA~\citep[LVK, ][]{LIGOScientific:2014pky, VIRGO:2014yos, KAGRA:2020agh} detector network offer a novel way to probe the existence of a lower mass gap that is free of such systematic biases~\citep{Farah:2021qom,  LIGOScientific:2024elc, KAGRA:2021duu}. Selection effects in GW observations are well understood and easily modeled through the recovery of simulated sources injected into detector noise realizations~\citep{Thrane:2018qnx,Mandel:2018mve,popgw2,popgw3}, which can then be used to obtain the astrophysical mass distribution of compact objects as compared to the observed distributions inferred by LMXB investigations. Previous studies have attempted this exploration by analyzing all CBC observations~(including NS containing events) using a mass distribution model that allows for a shallow gap~\citep{Farah:2021qom,  KAGRA:2021duu, LIGOScientific:2024elc}. The location, depth, and width of the gap were inferred a posteriori, and Bayesian evidences were computed for values of these parameters that correspond to the presence and absence of a lower gap. 
 
 \cite{Farah:2021qom} have found from the second gravitational wave transient catalog~\citep{LIGOScientific:2020ibl} that the parameters controlling the gap-like feature built into their mass distribution model have a posteriori values that prefer the existence of a lower mass gap with a Bayes factor of 55.0 over its absence. Subsequent studies by \cite{KAGRA:2021duu} and \cite{LIGOScientific:2024elc} have updated this number to lower values by including events from the third gravitational wave transient catalog~\citep[GWTC-3,][]{KAGRA:2021vkt} and the newly discovered mass-gap event GW230529~\cite[a compact binary merger whose most massive component lies in the $3-5M_{\odot}$ mass range,][]{LIGOScientific:2024elc}. \cite{KAGRA:2021duu} have further reported that there is no significant observational preference in GWTC-3 for or against models that exhibit or rule out a lower mass gap as compared to a default mass distribution model, which is agnostic of any gap-like feature in the relevant mass range.
 %These studies have found no significant observational preference for the existence of a lower mass gap using data from the third gravitational wave transient catalog~\citep[GWTC-3,][]{KAGRA:2021vkt} and the newly discovered mass-gap event GW230529~\cite[a compact binary merger whose most massive component lies in the $3-5M_{\odot}$ mass range,][]{LIGOScientific:2024elc}.
 
 
-It is to be noted, however, that in addition to the difference in the treatment of selection biases, existing GW-based studies have explored a fundamentally different property of the compact object mass spectrum than the LMXB investigations, on which we elaborate as follows. The LMXB dataset comprises of observed systems whose only compact object components are BHs~(more massive than the heaviest possible non-rotating NS), with the corresponding analyses attempting to constrain the minimum mass of BHs either as a cutoff or percentile of the inferred BH mass function~\citep{Bailyn:1997xt, Ozel:2010su, Farr:2010tu}. The GW analyses have instead tried to identify a dearth of binary mergers in the full compact object mass spectrum, near the maximum NS mass, using a dataset of observed systems that comprise both BHs and/or NSs~\citep[i.e. including BNS systems,][]{Farah:2021qom, KAGRA:2021duu}. \textit{Hence, direct comparison of existing GW and LMXB-based probes of the lower mass gap might not be fully justified given the fundamental difference between these approaches in their definitions of the lower-mass gap as a property of the compact object mass spectrum.} %\textit{Hence, selection effects alone might not explain the discrepancy between the existing GW and LMXB-based probes of the lower mass gap.}
+It is to be noted, however, that in addition to the difference in the treatment of selection biases, existing GW-based studies have explored a fundamentally different property of the compact object mass spectrum than the LMXB investigations, on which we elaborate as follows. The LMXB dataset comprises of observed systems whose only compact object components are BHs~(more massive than the heaviest possible non-rotating NS), with the corresponding analyses attempting to constrain the minimum mass of BHs either as a cutoff or percentile of the inferred BH mass function~\citep{Bailyn:1997xt, Ozel:2010su, Farr:2010tu}. The GW analyses have instead tried to model and identify a dearth of binary mergers in the full compact object mass spectrum, near the maximum NS mass, using a dataset of observed systems that comprise both BHs and/or NSs~\citep[i.e. including BNS systems,][]{Farah:2021qom, KAGRA:2021duu, LIGOScientific:2024elc}. \textit{Hence, direct comparison of existing GW and LMXB-based probes of the lower mass gap might not be fully justified given the fundamental difference between these approaches in their definitions of the lower-mass gap as a property of the compact object mass spectrum.} %\textit{Hence, selection effects alone might not explain the discrepancy between the existing GW and LMXB-based probes of the lower mass gap.}
 
 In this paper, using flexibly parametrized population models, we analyze GW
 observations of CBCs whose BH components are more massive than the heaviest
 possible NSs and constrain the minimum BH mass as a percentile of the inferred
-BH mass function~\citep{Farr:2010tu}.  By relying on a mass cut to prevent NS
+BH mass function~\citep[simmilar to the approach of X-ray binary studies, ][]{Farr:2010tu}.  By relying on a mass cut to prevent NS
 components from contaminating our analysis and using a generic model for the BH
-mass spectrum, we constrain the first percentile of the BH mass function, given
-data from GWCT3 and GW230529. \chcomment[id=W]{\ldots which we constrain to $XX
-\, M_\odot$\ldots.} Our models respond to the overall abundance of mergers
+mass spectrum, we constrain the first percentile of the BH mass function to be within $3M_{\odot}$ at $90\%$ confidence, given
+data from GWCT3 and GW230529. Our models respond to the overall abundance of mergers
 with black holes in the mass range just above that of the heaviest neutron
-stars. \chcomment[id=W]{}. We show that our results are robust against reasonable variations of
+stars, and not to any explicitly modeled gap-like feature in the distribution functions. We show that our results are robust against reasonable variations of
 the mass-cut imposed during event selection and of the functional forms of the
-population models used in the analysis. \textcolor{orange}{The discrepancy
+population models used in the analysis. The discrepancy
 between our measurements of the minimum BH mass and that of LMXB studies can
 therefore be attributed either to the differences in the treatment of selection
 effects, or potentially to that in the evolutionary pathways of LMXBs and BH
-containing CBC systems} or to systematic mis-estimation of
+containing CBC systems, or to systematic mis-estimation of
 masses in at least some LMXB systems.
 %Our models are agnostic of any additional feature (gap-likeor otherwise) in the lower end of the BH mass function, leading to our inference being driven solely by the relative abundance of astrophysical events whose BHs are heavier than the chosen mass cut
 % By relying on a mass cut to prevent NS components from contaminating our analysis and using a generic model for the BH mass spectrum, we constrain the first percentile of the BH mass function to be \textcolor{orange}{\monepctplgplpunits~(\monepctplgplpincludingnewunits)} with 90\% posterior probability given GW data~(including GW230529). We also find a local maxima in the BH mass function near $m = \mpeakplgplpunits$, with the merger rate density falling by nearly an order of magnitude on either side of the peak.
@@ -265,19 +259,19 @@ for $m_\mathrm{low} \leq m \leq m_\mathrm{high}$ which can be written as:
 
 \subsection{Bayesian Hierarchical Inference}
 \noindent
-\chcomment[id=W]{.}
+
 To infer the hyperparameters characterizing our mass function models, we employ
 Bayesian hierarchical methods on our selection of GWTC-3 events (described
 below). Merging BBHs constitute an inhomogeneous Poisson
 process.  Modeling such a process subject to observations with
 measurement uncertainty and selection effects is described
-\citet{Mandel:2018mve,pop-vitale,popgw2,popgw3}.\chreplaced[id=W]{.}{}
+\citet{Mandel:2018mve,pop-vitale,popgw2,popgw3}.
 Note that here we do not model the distribution of CBC spin parameters which
 amounts to fixing the same to the uninformative priors used during single event
 PE, which are isotropically oriented component spins distributed uniformly in
 magnitude \citep{KAGRA:2021duu}.  
 
-We impose uniform priors on all hyperparameters.  We use Hamiltonian Monte-Carlo
+We impose uniform priors on all hyperparameters. We use Hamiltonian Monte-Carlo
 methods, specifically the No U Turn Sampler~\citep[NUTS, ][]{HMC, HMC-NUTS}, to
 sample from the population model posterior. To ensure quick and efficient
 computation of the selection function normalization \citep{Mandel:2018mve}, we
@@ -295,14 +289,14 @@ With the primary goal of constraining the minimum BH mass, we chose our dataset 
 While the lower cut on primary mass is necessary to ensure that we are modeling
 features of the BH mass function, the upper cuts on chirp mass are
 imposed to remove events that are not expected to contribute to the inference of
-the low-mass BBH population \chcomment[id=W]{?}. \chreplaced[id=W]{}{} Our canonical analysis uses $(3M_{\odot},
+the low-mass BBH population. Our canonical analysis uses $(3M_{\odot},
 \mchighunits)$ respectively for ($m_\mathrm{low},
 M_{c,\mathrm{max}}$). Out of these bounds we expect $m_\mathrm{low}$ to
 have the most significant impact on the inference of $m_{1\%}$. We study the
 systematic changes in $m_{1\%}$ due to variations in $m_\mathrm{low}$ by re-running the analysis with different choices of $m_\mathrm{low}$ values near $3M_{\odot}$ and comparing the
 corresponding $m_{1\%}$ posteriors.
 
-\chreplaced[id=W]{,}{}To restrict to low-mass events we impose the requirement that $50\%$ of posterior samples
+To restrict to low-mass events, we impose the requirement that $50\%$ of posterior samples
 for each event lie within our chosen mass-cuts.  Technically speaking, because
 the posterior distribution sampled by parameter estimation is a function of the
 data, these cuts satisfy the model assumptions of the selected population models
@@ -318,7 +312,7 @@ posterior distributions of the selected events; because chirp mass is so
 well-measured, only one event's inclusion in the analysis set depends in any
 meaningful way on the 50\% threshold chosen (i.e.\ for all but one event, our
 mass cuts are equivalent to imposing the same cut on the---unknown---true
-masses). \chcomment[id=W]{.} During inference, we further impose
+masses). During inference, we further impose
 $(dN/dm_1dm_2dz)=0$ outside of the cuts and normalize the distributions
 accordingly. 
 
@@ -329,11 +323,9 @@ normalizing it in between $m_\mathrm{low}<m<m_\mathrm{high}$~(see
 Eq.~\eqref{eq:pm-definition}). This justifies a direct comparison of our
 measurements with LMXB studies~\citep{Bailyn:1997xt, Farr:2010tu, Ozel:2010su}
 which also attempt to constrain the minimum BH mass from a dataset of observed
-systems whose only compact object components are BHs, \chcomment[id=W]{.} in contrast to other GW-based studies~\citep{Farah:2021qom}
+systems whose only compact object components are BHs, in contrast to other GW-based studies~\citep{Farah:2021qom}
 which instead look for a dearth in the full compact object mass spectrum near
 the maximum NS mass from a dataset of BNS, NSBH, and BBH systems.
-
-%\todo{Soumendra (from Will's group) has an interesting discussion to add regarding the potential systematics of apply cuts differently on events and selection samples.}
 
 \begin{figure}[htp]
     \includegraphics[width=\columnwidth]{figures/m1-m2-contour_including_230529.pdf}
@@ -380,9 +372,9 @@ year) and mass-cuts along with the mass gap event GW230529. We use single-event
 posterior samples publicly released by the LVK~\citep{gwosco3, gwosco4} for each
 observation to construct our likelihood. We also use LVK's publicly released set
 of detectable injections~\citep{gwosco3} to compute the
-\chreplaced[id=W]{}{} which corrects for selection biases in the
+ which corrects for selection biases in the
 analysis. Note that this set of detectable simulations estimates detector
-sensitivity \chreplaced[id=W]{}{} through the LVK's third observation run
+sensitivity through the LVK's third observation run
 which we expect to suffice since GW230529 was detected within the first two
 weeks of the fourth observing run~\citep{LIGOScientific:2024elc}.
 
@@ -393,8 +385,7 @@ distributions of individual component BH masses and In
 Fig.~\ref{fig:pm-traces_including_230529}, the common BH mass function of
 Eq.~\eqref{eq:pm-definition}. Using both of our models we find a strong excess
 of BHs near $m=\mpeakplgplpincludingnewunits$, with an overall merger rate density of
-\dNlogmpeakincludingnewunits per log mass squared, with the numbers corresponding to the BPLG model. \chcomment[id=W]{}
-\chcomment[id=W]{} The merger rate density is found to fall off by nearly an order of
+\dNlogmpeakincludingnewunits per log mass squared, with the numbers corresponding to the BPLG model. The merger rate density is found to fall off by nearly an order of
 magnitude on either side of this peak. We find that our models tend to disagree
 towards the lower end of the mass spectrum with the BPL model predicting a
 sharper drop in merger rate density. This behavior is expected given the lower
@@ -421,11 +412,11 @@ In Fig.~\ref{fig:m1pct_including_230529}, we show our posterior distribution for
    % \subfigure[$m_\mathrm{low}=3.25$]{\includegraphics[width=0.5\columnwidth]{figures/m1pct_including_230529_3.25.pdf}}
    % \subfigure[$m_\mathrm{low}=3.5$]{\includegraphics[width=0.5\columnwidth]{figures/m1pct_including_230529_3.5.pdf}}
      \includegraphics[width=\columnwidth]{figures/violin_plot.pdf}
-     \caption{\label{fig:m1pct_including_230529_varying} The posterior for $m_{1\%}$, corresponding to different values of $m_{\mathrm{low}}$ for the BPLG model in the form of violin plots.\todo{!KDE in violin plot is not bounded}}
+     \caption{\label{fig:m1pct_including_230529_varying} The posterior for $m_{1\%}$, corresponding to different values of $m_{\mathrm{low}}$ for the BPLG model in the form of violin plots.}
  \end{figure}
 
 To explore the existence of any systematic biases arising from an arbitrarily
-chosen $m_\mathrm{low}$, \chadded[id=W]{}which describes the boundary between the
+chosen $m_\mathrm{low}$, which describes the boundary between the
 neutron star and black hole mass functions in our models, we look at variations
 in the measured $m_{1\%}$ values when the fixed $m_\mathrm{low}$ value is taken
 to be something in the range $(2.5M_{\odot},3.5M_{\odot})$, which is shown in
@@ -437,14 +428,12 @@ $m_{\mathrm{low}}$. We see the posteriors start to grow broader with increasing
 $m_\mathrm{low}$. The broadening of the posterior for $m_\mathrm{low}<3$ as well
 as the location of its peak is expected since in that range the secondary
 component of GW190814~\citep{LIGOScientific:2020zkf} stops contributing to the
-BH mass function for $m_\mathrm{low}>2.7$, \chreplaced[id=W]{}{} at which point
+BH mass function for $m_\mathrm{low}>2.7$, at which point
 the $m_{1\%}$ inference is driven by the primary component of
 GW230529. For  $m_\mathrm{low}>3.25$, posterior samples of GW230529 start
 getting excluded leading to weaker inference of the mass distribution in the
 lower end since that is the only event that contributes dominantly to the
-inference. \todo{Re-write?, Improve violin plots for
-Fig.~\ref{fig:m1pct_including_230529_varying}: !KDE in violin plot is not
-bounded.}
+inference.
 
 % \begin{figure}
 %     \includegraphics[width=\columnwidth]{figures/dNdm_traces.pdf}
@@ -497,15 +486,15 @@ bounded.}
 %     \item{Anything astrophysical that can cause this difference between LMXB and BBH/NSBH systems.}
 %     \item{Discuss implication of 10$M_{\odot}$ peak.}
 % \end{itemize}
-We have constrained the minimum BH mass using GW observations of CBC systems at least one of whose components is a BH. Using flexibly parametrized population models and a mass cut to filter out BNS and high mass BBH events, we find the posterior distribution of the first percentile of the BH mass function to be 90\% within \monepctplgplpincludingnewunits for our most flexible model. Our methodology justifies a direct comparison with LMXB-based probes of the lower mass gap modulo their treatment of selection effects. We find that for our most flexible population model, the existing sample of GW detections does not exhibit a lower mass gap in contrast to LMXB-based measurements, which can indicate the latter to be Malmquist biased~\citep{Siegel:2022gwc}. For our less flexible model, however, we find that the current sample of GW detections does not require a gap but may permit one, with the $m_{1\%}$ posterior having small yet non-vanishing support near $5M_{\odot}$.
+We have constrained the minimum BH mass using GW observations of CBC systems at least one of whose components is a BH. Using flexibly parametrized population models and a mass cut to filter out BNS and high mass BBH events, we find the posterior distribution of the first percentile of the BH mass function to be 90\% within \monepctplgplpincludingnewunits for our most flexible model (broken power-law with a Gaussian peak). Our methodology justifies a direct comparison with LMXB-based probes of the lower mass gap modulo their treatment of selection effects. We find that for our most flexible population model, the existing sample of GW detections does not exhibit a lower mass gap in contrast to LMXB-based measurements, which can indicate the latter to be Malmquist biased~\citep{Siegel:2022gwc}. For our less flexible model, however, we find that the current sample of GW detections does not require a gap but may permit one, with the $m_{1\%}$ posterior having small yet non-vanishing support near $5M_{\odot}$.
 
 In addition to transient LMXB selection effects, an alternative explanation for this discrepancy is plausible. Merging BBH and NSBH systems with BHs in the lower mass gap can form through several scenarios such as hierarchical mergers in multiple systems~\citep{Lu:2020gfh, Liu:2020gif}, dynamical encounters in young metal-rich stellar clusters~\citep{ArcaSedda:2021zmm}, non-segregated clusters~\citep{Clausen:2014ksa, Fragione:2020wac, Rastello:2020sru}, and near active galactic nuclei~\citep{McKernan:2020lgr, Yang:2020xyi}, and massive stellar binaries~\citep{Antoniadis:2021dhe}, that are not expected to yield LMXB systems. Identifying the contributions of these specific evolutionary pathways to low mass NSBH and BBH formation might necessitate the inference of higher dimensional population distributions that model not only the mass spectrum but also its correlations with other CBC parameters such as component spin magnitudes and orientations. However, given the small number of events in the lower gap, such an inference is likely to be uninformative given current datasets and is hence left as a future exploration.
 
-Akin to existing studies~\citep[e.g.,][]{KAGRA:2021duu, LIGOScientific:2024elc}, we find an excess
+In accordance to existing studies~\citep[e.g.,][]{KAGRA:2021duu, LIGOScientific:2024elc}, we also recover an excess
 of BHs near $m=\mpeakplgplpincludingnewunits$, with the merger rate density at the location of the being \dNlogmpeakincludingnewunits per log mass squared. We further characterize the fall-off in the merger rate density on either side of the peak. In particular, we find that in the low-mass end, the maximum fall-off compared to the peak is less than an order of magnitude, with the rate density at $3M_{\odot}$ being \dNlogmmlowincludingnewunits per log mass squared. We note that while various population models used in previous analyses have identified these features individually,  we are able to reconstruct both simultaneously using a single mass model, thereby showing that the data is consistent with a mass function that has a relatively strong peak near $10M_{\odot}$ and a very shallow fall-off in merger rate density towards the lower end of said peak, right up to the NS region of the parameter space.
 
 The presence of both a strong peak and a shallow drop in merger rate density towards the lower end of the BH mass spectrum has interesting astrophysical implications. Several models of compact binary formation, such as isolated stellar binaries undergoing stable
-mass transfer without a common envelope phase~\citep{vanSon:2022myr}, can explain this abundance of $8-10M_{\odot}$ BBHs or the shallow gap between NSs and BHs individually. For this particular formation channel, \cite{vanSon:2022myr} demonstrate that the astrophysical prescriptions that give rise to a strong peak near $10M_{\odot}$ also predict a very sharp fall of in merger rate density, which can drop by several orders of magnitude even above $4M_{\odot}$. On the other hand, the physical assumptions that are consistent with a very drop in merger rate density predict no significant over-abundance of BBHs in the $8-10M_{\odot}$ range. In other words, any single channel modeled by  \cite{vanSon:2022myr} to explore the stable mass-transfer-only formation scenario cannot fully explain the shape of the BH mass function that we find in the lower end. If one were to assume that \cite{vanSon:2022myr} have exhaustively and accurately explored the stable-mass-transfer scenario, then our results could indicate substantial contributions from other formation channels, such as common-envelope evolution followed by stable mass transfer or dynamical encounters, to the observed population of low mass BHs.
+mass transfer without a common envelope phase~\citep{vanSon:2022myr}, can explain this abundance of $8-10M_{\odot}$ BBHs or the shallow gap between NSs and BHs individually. For this particular formation channel, \cite{vanSon:2022myr} demonstrate that the astrophysical prescriptions that give rise to a strong peak near $10M_{\odot}$ also predict a very sharp fall of in merger rate density, which can drop by several orders of magnitude even above $4M_{\odot}$. On the other hand, the physical assumptions that are consistent with a very shallow drop in merger rate density predict no significant over-abundance of BBHs in the $8-10M_{\odot}$ range. In other words, any single channel modeled by  \cite{vanSon:2022myr} to explore the stable mass-transfer-only formation scenario cannot fully explain the shape of the BH mass function that we find in the lower end. If one were to assume that \cite{vanSon:2022myr} have exhaustively and accurately explored the stable-mass-transfer scenario, then our results could indicate substantial contributions from other formation channels, such as common-envelope evolution followed by stable mass transfer or dynamical encounters, to the observed population of low mass BHs.
 
 % the existence of a lower mass gap which
 % is not observed in our results from the most flexible model \chcomment[id=W]{I
@@ -563,7 +552,7 @@ mass transfer without a common envelope phase~\citep{vanSon:2022myr}, can explai
 \label{sec:conclusion}
 \section{Acknowledgements}
 \begin{acknowledgments}
-    We thank Jeff Andrews for comments on an early version of this work.
+    We thank Jeff Andrews for comments on an early version of this work. This research was also supported in part through the computational resources and staff contributions provided for the Quest high-performance computing facility at Northwestern University, which is jointly supported by the Office of the Provost, the Office for Research, and Northwestern University Information Technology. A.R. was supported by the National Science Foundation~(NSF) award PHY-2207945. V.K. was supported by the Gordon and Betty Moore Foundation (grant awards GBMF8477 and GBMF12341), through a Guggenheim Fellowship, and the D.I. Linzer Distinguished University Professorship fund. The authors are grateful for computational resources provided by the LIGO Laboratory and supported by NSF Grants No. PHY-0757058 and No. PHY0823459. V.K. and A.R. gratefully acknowledge the support of the NSF-Simons AI-Institute for the Sky (SkAI) via grants NSF AST-2421845 and Simons Foundation MPS-AI-00010513. This material is based upon work supported by NSF’s LIGO Laboratory which is a major facility fully funded by the National Science Foundation. This research has made use of data obtained from the Gravitational Wave Open Science Center (gwosc.org), a service of LIGO Laboratory, the LIGO Scientific Collaboration, the Virgo Collaboration, and KAGRA. 
 \end{acknowledgments}
 
 \software{\texttt{zenodo-get} \citep{Volgyes2020}}
