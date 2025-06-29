@@ -168,10 +168,10 @@ We construct flexible population models for low-mass BBHs and analyze a sample o
 % \end{itemize}
 %Definition of our mass functions:
 \noindent
-\chcomment[id=W]{.}  We model the BH mass function as a part of the
-compact object mass spectrum above the maximum possible NS
-mass~($m_\mathrm{low}$) which we fix throughout the analysis. To explore the
-low-mass BH population, we define our mass functions as follows:
+We model the BH mass function as a part of the compact object mass spectrum
+above the maximum possible NS mass~($m_\mathrm{low}$) which we fix throughout
+the analysis. To explore the low-mass BH population, we define our mass
+functions as follows:
 \begin{equation}
     \label{eq:intensity-definition}
     m_1 m_2 \frac{\dd N}{\dd m_1 \dd m_2 \dd V \dd t} = R(z) f\left( m_1 \right) f\left( m_2 \right) g(m_1, m_2).
@@ -287,7 +287,10 @@ Monte-Carlo sums used to compute the selection normalization and average over
 single-event likelihoods \citep{Pdet1-Farr,Pdet2-essick,Talbot2023}
 
 \subsection{Mass cuts and Event Selection}
-With the primary goal of constraining the minimum BH mass, we chose our dataset of low mass BH containing GW events based on the following mass-cuts:
+With the primary goal of constraining the minimum BH mass, we chose our dataset
+of low mass BH that are confidently detectied (false alarm rate from at least
+one LVK pipeline lower than $1 \, \mathrm{yr}^{-1}$ \citet{KAGRA:2021duu})
+containing GW events based on the following mass-cuts:
 \begin{equation}
    m_\mathrm{low}\leq m_1 ~\&~M_c\leq M_{c,\mathrm{max}}.
 \end{equation}
@@ -360,15 +363,15 @@ the maximum NS mass from a dataset of BNS, NSBH, and BBH systems.
 
 \begin{figure}
     \includegraphics[width=\columnwidth]{figures/pm_traces_including_230529.pdf}
-    \caption{\label{fig:pm-traces_including_230529} Inferred common mass distribution, $p(m)$,
-    (see Eq.~\eqref{eq:pm-definition}) for both models considered in this
-    analysis.  Dark lines show the posterior mean mass distribution; light lines
-    are individual draws from the posterior over mass distributions.  At high
-    masses, $m \gg \mu, m_b$, the mass function falls steeply in both models;
-    the broken power law plus Gaussian slope $\alpha_2 = \alphatwoplgplp$.
-    Toward lower masses from the peak, both power law models initially decline
-    significantly, though the power law plus Gaussian model rises again as $m
-    \to 3 \, M_\odot$.}
+    \caption{\label{fig:pm-traces_including_230529} Inferred common mass
+    distribution, $p(m)$, (see Eq.~\eqref{eq:pm-definition}) for both models
+    considered in this analysis.  Dark lines show the posterior mean mass
+    distribution; light lines are individual draws from the posterior over mass
+    distributions.  At high masses, $m \gg \mu, m_b$, the mass function falls
+    steeply in both models; the broken power law plus Gaussian slope $\alpha_2 =
+    \alphatwoplgplp$. Toward lower masses from the peak, both power law models
+    initially decline significantly, though the power law plus Gaussian model
+    may rise again as $m \to 3 \, M_\odot$.}
 \end{figure}
 
 In this section, we present our results obtained from the 25 GWTC-3 events that
@@ -376,12 +379,11 @@ satisfy our detection threshold~(i.e. a false alarm rate of less than one per
 year) and mass-cuts along with the mass gap event GW230529. We use single-event
 posterior samples publicly released by the LVK~\citep{gwosco3, gwosco4} for each
 observation to construct our likelihood. We also use LVK's publicly released set
-of detectable injections~\citep{gwosco3} to compute the
- which corrects for selection biases in the
-analysis. Note that this set of detectable simulations estimates detector
-sensitivity through the LVK's third observation run
-which we expect to suffice since GW230529 was detected within the first two
-weeks of the fourth observing run~\citep{LIGOScientific:2024elc}.
+of detectable injections~\citep{gwosco3} to correct for selection biases in the
+analysis \citep{Mandel:2018mve}. Note that this set of detectable simulations
+estimates detector sensitivity through the LVK's third observation run which we
+expect to suffice since GW230529 was detected within the first two weeks of the
+fourth observing run~\citep{LIGOScientific:2024elc}.
 
 
 
@@ -557,10 +559,31 @@ mass transfer without a common envelope phase~\citep{vanSon:2022myr}, can explai
 \label{sec:conclusion}
 \section{Acknowledgements}
 \begin{acknowledgments}
-    We thank Jeff Andrews for comments on an early version of this work. This research was also supported in part through the computational resources and staff contributions provided for the Quest high-performance computing facility at Northwestern University, which is jointly supported by the Office of the Provost, the Office for Research, and Northwestern University Information Technology. A.R. was supported by the National Science Foundation~(NSF) award PHY-2207945. V.K. was supported by the Gordon and Betty Moore Foundation (grant awards GBMF8477 and GBMF12341), through a Guggenheim Fellowship, and the D.I. Linzer Distinguished University Professorship fund. The authors are grateful for computational resources provided by the LIGO Laboratory and supported by NSF Grants No. PHY-0757058 and No. PHY0823459. V.K. and A.R. gratefully acknowledge the support of the NSF-Simons AI-Institute for the Sky (SkAI) via grants NSF AST-2421845 and Simons Foundation MPS-AI-00010513. This material is based upon work supported by NSF’s LIGO Laboratory which is a major facility fully funded by the National Science Foundation. This research has made use of data obtained from the Gravitational Wave Open Science Center (gwosc.org), a service of LIGO Laboratory, the LIGO Scientific Collaboration, the Virgo Collaboration, and KAGRA. 
+    We thank Jeff Andrews for comments on an early version of this work. This
+research was also supported in part through the computational resources and
+staff contributions provided for the Quest high-performance computing facility
+at Northwestern University, which is jointly supported by the Office of the
+Provost, the Office for Research, and Northwestern University Information
+Technology.   Some computations in this work were, in part, run at facilities
+supported by the Scientific Computing Core at the Flatiron Institute, a division
+of the Simons Foundation.  A.R. was supported by the National Science
+Foundation~(NSF) award PHY-2207945. V.K. was supported by the Gordon and Betty
+Moore Foundation (grant awards GBMF8477 and GBMF12341), through a Guggenheim
+Fellowship, and the D.I. Linzer Distinguished University Professorship fund.
+W.F.~is partially supported by the Center for Computational Astrophysics, part
+of the Flatiron Institute, a division of the Simons Foundation.  The authors are
+grateful for computational resources provided by the LIGO Laboratory and
+supported by NSF Grants No. PHY-0757058 and No. PHY0823459. V.K. and A.R.
+gratefully acknowledge the support of the NSF-Simons AI-Institute for the Sky
+(SkAI) via grants NSF AST-2421845 and Simons Foundation MPS-AI-00010513. This
+material is based upon work supported by NSF’s LIGO Laboratory which is a major
+facility fully funded by the National Science Foundation. This research has made
+use of data obtained from the Gravitational Wave Open Science Center
+(gwosc.org), a service of LIGO Laboratory, the LIGO Scientific Collaboration,
+the Virgo Collaboration, and KAGRA. 
 \end{acknowledgments}
 
-\software{\texttt{zenodo-get} \citep{Volgyes2020}}
+\software{\texttt{Makie.jl} \citep{DanischKrumbiegel2021}; \texttt{Turing.jl} \citep{ge2018t}; \texttt{zenodo-get} \citep{Volgyes2020}}
 
 \clearpage
 
