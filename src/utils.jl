@@ -82,12 +82,12 @@ function chirp_mass(m1, m2)
     mt*eta^(3/5)
 end
 
-function filter_selected(samps, fnames, gwnames, table)
+function filter_selected(samps, fnames, gwnames, table; m_low::Union{Float64, Nothing} = nothing)
     mask = map(samps) do ss
         m1s = [x.mass_1_source for x in ss]
         m2s = [x.mass_2_source for x in ss]
     
-        sel = isselected.(m1s, m2s)
+        sel = isselected.(m1s, m2s; m_low=m_low)
         sum(sel) > default_selection_fraction*length(sel)
     end
     samps = samps[mask]

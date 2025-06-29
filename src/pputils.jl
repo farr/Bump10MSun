@@ -1,9 +1,16 @@
+using Pkg
+Pkg.activate(joinpath(@__DIR__, ".."))
+using Interpolations
+using Statistics
+using KernelDensity
+
 """
     hdi_interval(xs::AbstractVector, q)
 
 Return `(l,h)`, the shortest interval that contains a fraction `q` of the values
 in `xs`.
 """
+
 function hdi_interval(xs::AbstractVector, q)
     xs = sort(xs)
     n = length(xs)
@@ -42,6 +49,33 @@ function median_hdi(x, q=0.68)
 
     return (m, h, l)
 end
+
+function hpd(samples, alpha)
+    x = sort(copy(samples))  # Sort a copy of the samples
+    n = length(x)
+    cred_mass = 1.0 - alpha
+
+    interval_idx_inc = floor(Int, cred_mass * n)
+    n_intervals = n - interval_idx_inc
+    interval_width = x[interval_idx_inc+1:end] .- x[1:n_intervals]
+
+    if length(interval_width) == 0
+        throw(ArgumentError("Too few elements for interval calculation"))
+    end
+
+    min_idx = argmin(interval_width)
+    hdi_min = x[min_idx]
+    hdi_max = x[min_idx + interval_idx_inc]
+
+    kde_result = kde(samples)
+    # Find the mode by locating the maximum density value
+    mode_index = argmax(kde_result.density)
+    mode_approx = kde_result.x[mode_index]
+
+    return [hdi_min, mode_approx, hdi_max]
+end
+
+
 
 raw"""
     result_macro(mname, samples; digits=1, q=0.68)
@@ -128,7 +162,7 @@ end
 function distribution_quantile(xs::AbstractVector, ys::AbstractVector, q::Real)
     cfm = cumtrapz(xs, ys)
     cfm .= cfm ./ cfm[end]
-    linear_interpolation(cfm, xs)(q)
+    LinearInterpolation(cfm, xs)(q)
 end
 
 """

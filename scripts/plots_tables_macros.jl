@@ -6,6 +6,7 @@ using Bump10MSun
 using CairoMakie
 using CSV
 using DataFrames
+using DelimitedFiles
 using DimensionalData
 using Distributions
 using LaTeXStrings
@@ -16,6 +17,23 @@ using Random
 using StatsBase
 using StatsFuns
 using Trapz
+using ArgParse
+
+s = ArgParseSettings()
+@add_arg_table s begin
+    "--o4a"
+        help = "Whether or not to include GW230529"
+        default = false
+        arg_type = Bool
+
+    "--mlow"
+        help = "Minimum mass for event selection"
+        default = nothing
+	arg_type = Float64
+end
+
+parsed_args = parse_args(s)
+m_low = parsed_args["mlow"]
 
 # Set the theme---each of these "sections" and plots are wrapped in a begin ...
 # end block so that you can run the whole thing within VSCode with a single
@@ -31,34 +49,63 @@ end
 
 # Load the Data
 begin
-    sampso3a, fnameso3a, gwnameso3a = load_pe_samples("/Users/wfarr/Research/gwtc-2.1/", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
-    sampso3b, fnameso3b, gwnameso3b = load_pe_samples("/Users/wfarr/Research/o3b_data/PE", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
-    gwtc3_table = DataFrame(CSV.File("/Users/wfarr/Research/gwtc-3-tables/GWTC.csv"))
+    sampso3a, fnameso3a, gwnameso3a = load_pe_samples("../../o3a", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
+    sampso3b, fnameso3b, gwnameso3b = load_pe_samples("../../o3b", "*GW*_nocosmo.h5", "C01:Mixed/posterior_samples")
+    if parsed_args["o4a"]
+      gwtc_table = DataFrame(CSV.File("../../GWTC-up.csv"))
 
-    samps = vcat(sampso3a, sampso3b)
-    fnames = vcat(fnameso3a, fnameso3b)
-    gwnames = vcat(gwnameso3a, gwnameso3b)
+      sampso4a, fnameso4a, gwnameso4a = load_pe_samples("../../o4a", "*GW*_nocosmo.h5", "Combined_PHM_highSpin/posterior_samples")
+      samps = vcat(sampso3a, sampso3b, sampso4a)
+      fnames = vcat(fnameso3a, fnameso3b, fnameso4a)
+      gwnames = vcat(gwnameso3a, gwnameso3b, gwnameso4a)
+    else
+      gwtc_table = DataFrame(CSV.File("../../GWTC.csv"))
 
-    samps, fnames, gwnames = filter_selected(samps, fnames, gwnames, gwtc3_table)
+
+      samps = vcat(sampso3a, sampso3b)
+      fnames = vcat(fnameso3a, fnameso3b)
+      gwnames = vcat(gwnameso3a, gwnameso3b)
+    end
+
+    samps, fnames, gwnames = filter_selected(samps, fnames, gwnames, gwtc_table; m_low = m_low)
     @info "Analyzing $(length(gwnames)) events:"
     for n in gwnames
         @info "  $(n)"
     end
 end
 
+if parsed_args["o4a"]
+  new_suffix = "_including_230529"
+  new_suffix_tex = "includingnew"
+else
+  new_suffix = ""
+  new_suffix_tex = ""
+end
+
+if m_low !== nothing
+  new_suffix = string( new_suffix * "_", round(m_low; digits=3))
+  if m_low !== 3.0
+    new_suffix_tex = string( new_suffix_tex * "_", round(m_low; digits=3))
+  end
+  m_low_copy = m_low
+else
+  m_low_copy = nothing
+  m_low = mlow
+end
+println(categorical_palette(2))
 # Load the MCMC samples
-traces = Dict(k => from_netcdf(joinpath(@__DIR__, "..", "chains", "chain" * suffix_map[k] * ".nc")) for k in keys(suffix_map))
+traces = Dict(k => from_netcdf(joinpath(@__DIR__, "..", "chains", "chain" * suffix_map[k] * new_suffix * ".nc")) for k in keys(suffix_map))
 
 # Compute various distributional quantities for the MCMC samples
 begin
-    ms = exp.(log(mlow):0.01:log(m_upper_limit))
+    ms = exp.(log(m_low):0.01:log(m_upper_limit))
     qs = collect(range(m_lower_limit/m_upper_limit, stop=1, length=128))
-    ms3 = exp.(log(mlow):0.01:log(m_upper_limit))
+    ms3 = exp.(log(m_low):0.01:log(m_upper_limit))
 
     function make_distribution_map(dN_maker, xs)
         Dict(
             k => map([traces[k].posterior[v] for v in var_name_map[k[1:2]]]...) do R, args...
-                dN = dN_maker(k[1], k[2], args...)
+                dN = dN_maker(k[1], k[2], args..., m_low = m_low_copy)
                 R .* dN.(xs)
             end for k in keys(traces)
         )
@@ -67,10 +114,9 @@ begin
     dNdm1s = make_distribution_map(make_dNdm1, ms)
     dNdm2s = make_distribution_map(make_dNdm2, ms)
     dNdqs = make_distribution_map(make_dNdq, qs)
-
     pms = Dict(
         k => map([traces[k].posterior[v] for v in vcat(mf_var_name_map[k[1]], ns_var_names)]...) do R, args...
-            p = make_dNdm(k[1], args...)
+            p = make_dNdm(k[1], args...; m_low = m_low_copy)
             pp = p.(ms)
             pp .= pp ./ trapz(ms, pp)
             pp
@@ -79,17 +125,38 @@ begin
 
     pms3 = Dict(
         k => map([traces[k].posterior[v] for v in vcat(mf_var_name_map[k[1]], ns_var_names)]...) do R, args...
-            p = make_dNdm(k[1], args...)
+            p = make_dNdm(k[1], args...; m_low = m_low_copy)
             pp = p.(ms3)
             pp .= pp ./ trapz(ms3, pp)
             pp
         end for k in keys(traces)
     )
-
+    
+    dNdms = Dict(
+        k => map([traces[k].posterior[v] for v in vcat(mf_var_name_map[k[1]], ns_var_names)]...) do R, args...
+            p = make_dNdm(k[1], args...; m_low = m_low_copy)
+            pp = p.(ms3)
+            pp .= pp ./ trapz(ms3, pp)
+            R .* pp
+        end for k in keys(traces)
+    )
+    dNdmsmlow = Dict(
+		    k => [dNdm[i, j][1] for i in 1:1000, j in 1:4]
+		    for (k,dNdm) in pairs(dNdms)
+    )
     m1pcts = Dict(
         k => [distribution_quantile(ms3, p, 0.01) for p in v]
         for (k,v) in pairs(pms3)
     )
+    for (key, value) in pairs(m1pcts)
+	println(key)
+	println(replace(mf_label_map[key[1]], " " => ""))
+	println(size(value))
+	open(joinpath(@__DIR__, "..", "paper", "figures", "m1pct_" * replace(mf_label_map[key[1]], " " => "") * "_" * new_suffix * ".txt"), "w") do io
+	    writedlm(io, vec(value))
+        end
+    end
+    
 end
 
 # Figure 1
@@ -131,14 +198,14 @@ begin
         position=:lt,
         nbanks=3)
 
-    band!(a, [mlow, m_upper_limit], [mlow, m_upper_limit], [m_upper_limit, m_upper_limit], color=(:grey, 0.5), label=nothing)
-    band!(a, [0, mlow], [0,0], [m_upper_limit, m_upper_limit], color=(:grey, 0.5), label=nothing)
+    band!(a, [m_low, m_upper_limit], [m_low, m_upper_limit], [m_upper_limit, m_upper_limit], color=(:grey, 0.5), label=nothing)
+    band!(a, [0, m_low], [0,0], [m_upper_limit, m_upper_limit], color=(:grey, 0.5), label=nothing)
 
     m1s = collect(mhigh:0.01:m_upper_limit)
     m2s = [bisect(m2 -> chirp_mass(m1, m2)-mchigh, 0, m_upper_limit) for m1 in m1s]
     band!(a, m1s, m2s, m1s, color=(:grey, 0.5), label=nothing)
 
-    save(joinpath(@__DIR__, "..", "paper", "figures", "m1-m2-contour.pdf"), f)
+    save(joinpath(@__DIR__, "..", "paper", "figures", "m1-m2-contour" * new_suffix * ".pdf"), f)
     f
 end
 
@@ -147,11 +214,11 @@ begin
     Random.seed!(9054612598149544883)
 
     colors = categorical_palette(2)
-    xtickoptions = (xtickformat="{:.0f}", xticks=[3, 10, 20], xminorticks=range(mlow, mhigh, step=1), xminorticksvisible=true, xminorgridvisible=true)
+    xtickoptions = (xtickformat="{:.0f}", xticks=[3, 10, 20], xminorticks=range(m_low, mhigh, step=1), xminorticksvisible=true, xminorgridvisible=true)
 
     f = Figure()
-    a1 = Axis(f[1,1]; xlabel=L"m_1 / M_\odot", ylabel=L"m_1 \mathrm{d} N / \mathrm{d} m_1 \mathrm{d} V \mathrm{d} t / \mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", xscale=log10, yscale=log10, limits=(mlow, mhigh, 1e-1, 1e3), xtickoptions...)
-    a2 = Axis(f[2,1]; xlabel=L"m_2 / M_\odot", ylabel=L"m_2 \mathrm{d} N / \mathrm{d} m_2 \mathrm{d} V \mathrm{d} t / \mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", xscale=log10, yscale=log10, limits=(mlow, mhigh, 1e-2, 1e2), xtickoptions...)
+    a1 = Axis(f[1,1]; xlabel=L"m_1 / M_\odot", ylabel=L"m_1 \mathrm{d} N / \mathrm{d} m_1 \mathrm{d} V \mathrm{d} t / \mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", xscale=log10, yscale=log10, limits=(m_low, mhigh, 1e-1, 1e3), xtickoptions...)
+    a2 = Axis(f[2,1]; xlabel=L"m_2 / M_\odot", ylabel=L"m_2 \mathrm{d} N / \mathrm{d} m_2 \mathrm{d} V \mathrm{d} t / \mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", xscale=log10, yscale=log10, limits=(m_low, mhigh, 1e-2, 1e2), xtickoptions...)
     for (i, k) in enumerate([(BrokenPowerLaw(), PowerLawPairing()), (PowerLawGaussian(), PowerLawPairing())])
         lines!(a1, ms, ms .* mean(dNdm1s[k]), label=mf_label_map[k[1]], color=colors[i])
         for _ in 1:100
@@ -166,7 +233,7 @@ begin
 
     axislegend(a1, position=:rb)
 
-    save(joinpath(@__DIR__, "..", "paper", "figures", "dNdm_traces.pdf"), f)
+    save(joinpath(@__DIR__, "..", "paper", "figures", "dNdm_traces" * new_suffix * ".pdf"), f)
     f
 end
 
@@ -178,7 +245,7 @@ begin
     colors = categorical_palette(2)
 
     f = Figure()
-    a = Axis(f[1,1], xlabel=L"m / M_\odot", ylabel=L"m p(m)", limits=(mlow, mhigh, yl, yh), xscale=log10, yscale=log10, xticks=[3, 10, 20], xtickformat="{:.0f}", xminorticks=range(3, 20, step=1), xminorgridvisible=true, xminorticksvisible=true)
+    a = Axis(f[1,1], xlabel=L"m / M_\odot", ylabel=L"m p(m)", limits=(m_low, mhigh, yl, yh), xscale=log10, yscale=log10, xticks=[3, 10, 20], xtickformat="{:.0f}", xminorticks=range(3, 20, step=1), xminorgridvisible=true, xminorticksvisible=true)
 
     for (i, k) in enumerate([(BrokenPowerLaw(), PowerLawPairing()), (PowerLawGaussian(), PowerLawPairing())])
         pm = pms[k]
@@ -191,26 +258,26 @@ begin
 
     axislegend(a, position=:lt)
 
-    save(joinpath(@__DIR__, "..", "paper", "figures", "pm_traces.pdf"), f)
+    save(joinpath(@__DIR__, "..", "paper", "figures", "pm_traces" * new_suffix * ".pdf"), f)
     f
 end
 
 # Figure 4
 begin 
-    xs = 3:0.01:6
+    xs = m_low:0.01:6
 
     f = Figure()
     a = Axis(f[1,1], xlabel=L"m_{1%} / M_\odot", limits=(minimum(xs), maximum(xs), 0, nothing), xminorgridvisible=true, yminorgridvisible=true, palette=(color=categorical_palette(2),))
 
     for (i, k) in enumerate([(BrokenPowerLaw(), PowerLawPairing()), (PowerLawGaussian(), PowerLawPairing())])
         sf = default_selection_fraction
-        kde = BoundedKDE(vec(m1pcts[k]), lower=3)
+        kde = BoundedKDE(vec(m1pcts[k]), lower=m_low)
         lines!(a, xs, pdf.((kde,), xs), label=mf_label_map[k[1]])
     end
 
     axislegend(a, position=:rt)
 
-    save(joinpath(@__DIR__, "..", "paper", "figures", "m1pct.pdf"), f)
+    save(joinpath(@__DIR__, "..", "paper", "figures", "m1pct" * new_suffix * ".pdf"), f)
     f
 end
 
@@ -221,31 +288,33 @@ begin
         write(f, s)
     end
 
-    open(joinpath(@__DIR__, "..", "paper", "result_macros.tex"), "w") do f
-        write_macro(f, result_macro(raw"\dNlogmpeak", raw"\mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", traces[PowerLawGaussian(), PowerLawPairing()].posterior.R, digits=0))
-        write_macro(f, result_macro(raw"\monepctplgplp", raw"M_\odot", m1pcts[PowerLawGaussian(), PowerLawPairing()], digits=2))
-        write_macro(f, result_macro(raw"\mpeakplgplp", raw"M_\odot", traces[PowerLawGaussian(), PowerLawPairing()].posterior.mu, digits=2))
-        write_macro(f, result_macro(raw"\alphatwoplgplp", traces[PowerLawGaussian(), PowerLawPairing()].posterior.a2, digits=1))
-        write_macro(f, "\\newcommand{\\mlow}{$(mlow)}\n\\newcommand{\\mlowunits}{\\ensuremath{\\mlow \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mclow}{$(mclow)}\n\\newcommand{\\mclowunits}{\\ensuremath{\\mclow \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mchigh}{$(mchigh)}\n\\newcommand{\\mchighunits}{\\ensuremath{\\mchigh \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\mhigh}{$(mhigh)}\n\\newcommand{\\mhighunits}{\\ensuremath{\\mhigh \\, M_\\odot}}")
-        write_macro(f, "\\newcommand{\\nevts}{$(length(gwnames))}")
+    open(joinpath(@__DIR__, "..", "paper", "result_macros" * new_suffix * ".tex"), "w") do f
+        write_macro(f, result_macro(raw"\dNlogmpeak" * new_suffix_tex, raw"\mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", traces[PowerLawGaussian(), PowerLawPairing()].posterior.R, digits=0))
+	write_macro(f, result_macro(raw"\dNlogmmlow" * new_suffix_tex, raw"\mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", dNdmsmlow[PowerLawGaussian(), PowerLawPairing()].* m_low, digits=0))
+        write_macro(f, result_macro(raw"\monepctplgplp" * new_suffix_tex , raw"M_\odot", m1pcts[PowerLawGaussian(), PowerLawPairing()], digits=2))
+        write_macro(f, result_macro(raw"\mpeakplgplp" * new_suffix_tex, raw"M_\odot", traces[PowerLawGaussian(), PowerLawPairing()].posterior.mu, digits=2))
+        write_macro(f, result_macro(raw"\alphatwoplgplp" * new_suffix_tex, traces[PowerLawGaussian(), PowerLawPairing()].posterior.a2, digits=1))
+        write_macro(f, "\\newcommand{\\mlow" * new_suffix_tex * "}{$(m_low)}\n\\newcommand{\\mlowunits" * new_suffix_tex * "}{\\ensuremath{\\mlow \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mclow" * new_suffix_tex *"}{$(mclow)}\n\\newcommand{\\mclowunits" * new_suffix_tex * "}{\\ensuremath{\\mclow \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mchigh" * new_suffix_tex * "}{$(mchigh)}\n\\newcommand{\\mchighunits" * new_suffix_tex * "}{\\ensuremath{\\mchigh \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\mhigh" * new_suffix_tex * "}{$(mhigh)}\n\\newcommand{\\mhighunits" * new_suffix_tex * "}{\\ensuremath{\\mhigh \\, M_\\odot}}")
+        write_macro(f, "\\newcommand{\\nevts" * new_suffix_tex * "}{$(length(gwnames))}")
     end
 end
 
 # Table 1
 begin
-    open(joinpath(@__DIR__, "..", "paper", "table1_content.tex"), "w") do f
+    open(joinpath(@__DIR__, "..", "paper", "table1_content" * new_suffix * ".tex"), "w") do f
         write(f, "\\begin{deluxetable}{llll}\n\\tablecolumns{3}\n\\tablecaption{\\label{tab:monepct} \$m_{1\\%}\$ for our various models and using different selection functions.}\n")
-        write(f, "\\tablehead{\\colhead{Mass Function Model} & \\colhead{\$m_{1\\%} / M_\\odot\$ (1-\$\\sigma\$, 68\\%)} & \\colhead{\$m_{1\\%} / M_\\odot\$ range (2-\$\\sigma\$, 95\\%)}}\n")
+        write(f, "\\tablehead{\\colhead{Mass Function Model} & \\colhead{\$m_{1\\%} / M_\\odot\$ (90\\%)} & \\colhead{\$m_{1\\%} / M_\\odot\$ range (90\\%)}}\n")
         write(f, "\\startdata\n")
         for mf in [BrokenPowerLaw(), PowerLawGaussian()]
             k = (mf, PowerLawPairing())
             m1p = m1pcts[k]
     
-            m, h, l = median_plus_minus(vec(m1p), 0.68)
-            ll, hh = quantile.((vec(m1p),), [0.025, 0.975])
+            ll, m, hh = hpd(vec(m1p), 0.1)
+	    l = m-ll
+	    h = hh-m
     
             write(f, "\\texttt{" * mf_label_map[mf] * "}")
             write(f, @sprintf("& \$%.2f^{+%.2f}_{-%.2f}\$", m, h-m, m-l))
