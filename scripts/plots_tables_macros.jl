@@ -189,7 +189,18 @@ begin
         y = collect(range(minimum(m2)-sig_m2, stop=maximum(m2)+sig_m2, length=127))
 
         Z = [(xx > yy ? logpdf(k, [xx, yy]) : -Inf) for xx in x, yy in y]
-        contour!(a, x, y, Z, levels=ls, color=colors[i], label=n)
+	if occursin("GW151012", n)
+	  label = "GW151012"
+	elseif occursin("GW151226", n)
+	  label = "GW151226"
+	elseif occursin("GW170608", n)
+	  label = "GW170608"
+	elseif occursin("GW230529", n)
+	  label = "GW230529_181500"
+	else
+	  label = n
+	end
+        contour!(a, x, y, Z, levels=ls, color=colors[i], label=label)
     end
 
     axislegend(a, 
@@ -317,7 +328,7 @@ begin
 	    h = hh-m
     
             write(f, "\\texttt{" * mf_label_map[mf] * "}")
-            write(f, @sprintf("& \$%.2f^{+%.2f}_{-%.2f}\$", m, h-m, m-l))
+            write(f, @sprintf("& \$%.2f^{+%.2f}_{-%.2f}\$", m, h, l))
             write(f, @sprintf("& \$\\left[%.1f, %.1f \\right]\$", ll, hh))
             write(f, "\\\\ \n")
         end
