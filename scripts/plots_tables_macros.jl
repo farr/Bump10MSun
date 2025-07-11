@@ -83,8 +83,8 @@ else
 end
 
 if m_low !== nothing
-  new_suffix = string( new_suffix * "_", round(m_low; digits=3))
   if m_low !== 3.0
+    new_suffix = string( new_suffix * "_", round(m_low; digits=3))
     new_suffix_tex = string( new_suffix_tex * "_", round(m_low; digits=3))
   end
   m_low_copy = m_low

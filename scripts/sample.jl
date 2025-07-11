@@ -166,6 +166,8 @@ if parsed_args["o4a"]
   suffix = suffix*"_including_230529"
 end
 if m_low !== nothing
-  suffix = string(suffix*"_", round(m_low; digits = 3))
+  if m_low !== 3.0
+    suffix = string(suffix*"_", round(m_low; digits = 3))
+  end
 end
 to_netcdf(idata, joinpath(@__DIR__, "..", "chains", "chain" * suffix * ".nc"))
