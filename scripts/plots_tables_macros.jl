@@ -167,6 +167,7 @@ begin
     colors = categorical_palette(length(gwnames))
     f = Figure()
     a = Axis(f[1,1], xlabel=L"m_1 / M_\odot", ylabel=L"m_2 / M_\odot", limits=(0, m_upper_limit, 0, m_upper_limit))
+    gwnamesnew = [ ]
     @progress for (i, (n, s)) in enumerate(zip(gwnames, samps))
         m1 = [x.mass_1_source for x in s]
         m2 = [x.mass_2_source for x in s]
@@ -201,11 +202,12 @@ begin
 	  label = n
 	end
         contour!(a, x, y, Z, levels=ls, color=colors[i], label=label)
+	push!(gwnamesnew, label)
     end
 
     axislegend(a, 
         [LineElement(color=colors[i]) for i in 1:length(gwnames)],
-        gwnames,
+        gwnamesnew,
         position=:lt,
         nbanks=3)
 
