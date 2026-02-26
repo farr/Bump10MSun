@@ -97,10 +97,10 @@ open(out_tex, "w") do io
         lo2, mode2, hi2, plus2, minus2 = mode_pm_interval(bplg[m])
 
         bpl_mode  = "\$" * fmt2(mode1) * "^{+" * fmt2(plus1) * "}_{-" * fmt2(minus1) * "}\$"
-        bpl_int   = "[" * fmt2(hi1) * ", " * fmt2(lo1) * "]"
+        bpl_int   = "[" * fmt2(lo1) * ", " * fmt2(hi1) * "]"
 
         bplg_mode = "\$" * fmt2(mode2) * "^{+" * fmt2(plus2) * "}_{-" * fmt2(minus2) * "}\$"
-        bplg_int  = "[" * fmt2(hi2) * ", " * fmt2(lo2) * "]"
+        bplg_int  = "[" * fmt2(lo2) * ", " * fmt2(hi2) * "]"
 
         println(io,
             fmt2(m), " & ",
