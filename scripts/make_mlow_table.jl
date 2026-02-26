@@ -6,7 +6,7 @@ Pkg.add(["DelimitedFiles", "Printf"])
 using DelimitedFiles, Printf
 
 data_dir = "../paper/figures/"
-out_tex  = "../paper/figures/table_2_content.tex"
+out_tex  = "../paper/table_2_content.tex"
 
 name_bpl  = "m1pct_BrokenPL__including_230529"
 name_bplg = "m1pct_BrokenPowerLaw+Gaussian__including_230529"
