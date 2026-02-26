@@ -86,7 +86,7 @@ open(out_tex, "w") do io
     println(io, raw"\tablecolumns{5}")
 
     println(io, raw"\tablehead{")
-    println(io, raw"\colhead{$m_{\mathrm{low}} / M_\odot$} & \multicolumn{2}{c}{BPL} & \multicolumn{2}{c}{BPLG} \\")
+    println(io, raw"\colhead{$m_{\mathrm{low}} / M_\odot$} & \multicolumn{2}{c}{BPL} & \multicolumn{2}{c}{BPLG} \\\\")
     println(io, raw" & \colhead{$m_{1\%} / M_\odot$ (90\%)} & \colhead{$m_{1\%} / M_\odot$ range (90\%)} & \colhead{$m_{1\%} / M_\odot$ (90\%)} & \colhead{$m_{1\%} / M_\odot$ range (90\%)} ")
     println(io, raw"}")
 
