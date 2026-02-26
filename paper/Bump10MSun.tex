@@ -342,9 +342,9 @@ the maximum NS mass from a dataset of BNS, NSBH, and BBH systems.
     \caption{\label{fig:m1-m2-contour} Contour plot of the likelihood functions
     for the primary and secondary black hole masses in the events considered in
     this analysis.  The contours show credible regions containing $50\%$ and
-    $90\%$ of the likelihood for each event.  The dashed lines show our
-	selection cuts, with $m_1 > 3 \, M_\odot$ and $\mathcal{M} <
-    \mchighunits$.}
+	$90\%$ of the likelihood for each event.  The \textbf{shaded region represents the part of the parameter space excluded by our}
+	selection cuts, with \textbf{only the region spanned by} $m_1 > 3 \, M_\odot$ and $\mathcal{M} <
+	\mchighunits$ \textbf{included in our analysis}.}
 \end{figure}
 \newpage
 \section{Results}
@@ -360,7 +360,7 @@ the maximum NS mass from a dataset of BNS, NSBH, and BBH systems.
     m_2 < m_1 < 20 \, M_\odot$ from two models; both primary and secondary
     (marginal) mass functions are shown.  Dark lines show the posterior mean
     mass function; light lines are individual draws from the posterior over mass
-    functions.}
+	functions\textbf{; and dashed lines enclose the 90\% credible interval}.}
 \end{figure}
 
 \begin{figure}
@@ -369,7 +369,7 @@ the maximum NS mass from a dataset of BNS, NSBH, and BBH systems.
     distribution, $p(m)$, (see Eq.~\eqref{eq:pm-definition}) for both models
     considered in this analysis.  Dark lines show the posterior mean mass
     distribution; light lines are individual draws from the posterior over mass
-    distributions.  At high masses, $m \gg \mu, m_b$, the mass function falls
+	distributions\textbf{; and dashed lines enclose the 90\% credible interval}.  At high masses, $m \gg \mu, m_b$, the mass function falls
     steeply in both models; the broken power law plus Gaussian slope $\alpha_2 =
     \alphatwoplgplp$. Toward lower masses from the peak, both power law models
     initially decline significantly, though the power law plus Gaussian model
@@ -424,6 +424,7 @@ In Fig.~\ref{fig:m1pct_including_230529}, we show our posterior distribution for
      \caption{\label{fig:m1pct_including_230529_varying} The posterior for $m_{1\%}$, corresponding to different values of $m_{\mathrm{low}}$ for the BPLG model in the form of violin plots.}
  \end{figure}
 
+\input{table_2_content.txt}
 To explore the existence of any systematic biases arising from an arbitrarily
 chosen $m_\mathrm{low}$, which describes the boundary between the
 neutron star and black hole mass functions in our models, we look at variations
@@ -431,9 +432,8 @@ in the measured $m_{1\%}$ values when the fixed $m_\mathrm{low}$ value is taken
 to be something in the range $(2.5M_{\odot},3.5M_{\odot})$, which is shown in
 Fig.~\ref{fig:m1pct_including_230529_varying}. We find that the peak of the
 posterior closely follows the location of $m_\mathrm{low}$, which indicates the
-absence of a lower mass-gap for all $m_\mathrm{low}$ values chosen. Both models
-yield more constrained and peaked posteriors for smaller values of
-$m_{\mathrm{low}}$. We see the posteriors start to grow broader with increasing
+absence of a lower mass-gap for all $m_\mathrm{low}$ values chosen. \textbf{The corresponding credible intervals of $m_{1\%}$ as a function of $m_{\mathrm{low}}$ are listed in Table~\ref{tab:mlow-vs-m1}.} Both models yield more constrained and peaked posteriors for smaller values of
+$m_{\mathrm{low}}$.We see the posteriors start to grow broader with increasing
 $m_\mathrm{low}$. The broadening of the posterior for $m_\mathrm{low}<3M_{\odot}$ as well
 as the location of its peak is expected since in that range the secondary
 component of GW190814~\citep{LIGOScientific:2020zkf} stops contributing to the
@@ -483,7 +483,7 @@ inference.
 %\subsection{Including GW230529}
 
 
-
+\textbf{We note here that additional data from the complete fourth gravitational wave transient catalog \citep[GWTC-4, ][which was publicly unavailable at the time of submission]{LIGOScientific:2025slb} are in agreement with our our conclusions obtained from the much smaller dataset that only comprises GWTC-3 and the mass gap event GW230529\_181500. In particular, population analyses with the complete fourth catalog also find diminished support for a dearth of BHs in the $3-5M_{\odot}$ range and a shallow rise in the mass-spectrum upto a peak near $\sim10M_{\odot}$~\citep{LIGOScientific:2025pvj}. This is to be expected since GW230529\_181500 is the only event in GWTC-4 that contributes significantly to the inferred shapes of the mass spectrum below $10M_{\odot}$. However, the fall off at masses above the $10M_{\odot}$ peak is much sharper in GWTC-4, which is followed by a nearly flat plateau upto $\sim20M_{\odot}$\citep{LIGOScientific:2025pvj}. Hence, even though a reanalysis with GWTC-4 is not expected to change our key results which mostly concerns the lower end of the mass distribution at and below the $10M_{\odot}$ peak, it would likely necessitate more flexible models for the BBH part of the mass-spectrum, i.e., between the $10M_{\odot}$ peak and our high-mass cut of $\mathcal{M}\leq20M_{\odot}$. Such an investigation is currently ongoing.}
 
 
 

@@ -50,6 +50,11 @@ function median_hdi(x, q=0.68)
     return (m, h, l)
 end
 
+function hdi_interval(xs::AbstractMatrix, q)
+    intervals = map(j -> hdi_interval(view(xs, :, j), q), axes(xs,2))
+    first.(intervals), last.(intervals)
+end
+
 function hpd(samples, alpha)
     x = sort(copy(samples))  # Sort a copy of the samples
     n = length(x)
@@ -75,6 +80,39 @@ function hpd(samples, alpha)
     return [hdi_min, mode_approx, hdi_max]
 end
 
+function hpd_interval(samples::AbstractVector, q::Real)
+    x = sort!(collect(samples))          # plain Vector, sorted in-place
+    n = length(x)
+    n == 0 && throw(ArgumentError("empty samples"))
+    0 < q <= 1 || throw(ArgumentError("q must be in (0, 1]"))
+
+    m = floor(Int, q*n)                  # number of points in interval
+    m < 1 && throw(ArgumentError("Too few elements for interval calculation"))
+
+    n_intervals = n - m + 1
+    n_intervals < 1 && throw(ArgumentError("Too few elements for interval calculation"))
+
+    # widths of all candidate intervals of mass q
+    w = @views x[m:end] .- x[1:n_intervals]
+    i = argmin(w)
+
+    return (x[i], x[i + m - 1])
+end
+
+function hpd_interval(X::AbstractMatrix, q::Real)
+    intervals = map(j -> hpd_interval(Vector(X[:, j]), q), axes(X, 2))
+    return first.(intervals), last.(intervals)
+end
+
+function quantile_interval(samples::AbstractVector, qlo::Real=0.05, qhi::Real=0.95)
+    x = sort!(collect(samples))                # make it a plain Vector (works with DimensionalData too)
+    return (quantile(x, qlo), quantile(x, qhi))
+end
+
+function quantile_interval(X::AbstractMatrix, qlo::Real=0.05, qhi::Real=0.95)
+    intervals = map(j -> quantile_interval(Vector(X[:, j]), qlo, qhi), axes(X, 2))
+    return first.(intervals), last.(intervals)
+end
 
 
 raw"""
