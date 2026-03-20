@@ -234,11 +234,20 @@ begin
     a2 = Axis(f[2,1]; xlabel=L"m_2 / M_\odot", ylabel=L"m_2 \mathrm{d} N / \mathrm{d} m_2 \mathrm{d} V \mathrm{d} t / \mathrm{Gpc}^{-3} \, \mathrm{yr}^{-1}", xscale=log10, yscale=log10, limits=(m_low, mhigh, 1e-2, 1e2), xtickoptions...)
     for (i, k) in enumerate([(BrokenPowerLaw(), PowerLawPairing()), (PowerLawGaussian(), PowerLawPairing())])
         lines!(a1, ms, ms .* mean(dNdm1s[k]), label=mf_label_map[k[1]], color=colors[i])
-        for _ in 1:100
+	X = map(v -> ms .* v, dNdm1s[k])
+	low, high = quantile_interval( permutedims(reduce(hcat, vec(X)))) #, 0.9)
+        lines!(a1, ms, low, color=colors[i], linestyle = :dash, linewidth = 2.5)
+        lines!(a1, ms, high, color=colors[i], linestyle = :dash, linewidth = 2.5)
+
+	for _ in 1:100
             lines!(a1, ms, ms .* sample(dNdm1s[k]), color=(colors[i], 0.1), label=nothing)
         end
 
         lines!(a2, ms, ms .* mean(dNdm2s[k]), color=colors[i], label=nothing)
+	X = map(v -> ms .* v, dNdm2s[k])
+	low, high = quantile_interval( permutedims(reduce(hcat, vec(X)))) #, 0.9)
+        lines!(a2, ms, low, color=colors[i], linestyle = :dash, linewidth = 2.5)
+        lines!(a2, ms, high, color=colors[i], linestyle = :dash, linewidth = 2.5)
         for _ in 1:100
             lines!(a2, ms, ms .* sample(dNdm2s[k]), color=(colors[i], 0.1), label=nothing)
         end
@@ -264,6 +273,10 @@ begin
         pm = pms[k]
 
         lines!(a, ms, ms .* mean(pm), label=mf_label_map[k[1]], color=colors[i])
+	X = map(v -> ms .* v, pm)
+	low, high = quantile_interval( permutedims(reduce(hcat, vec(X)))) #, 0.9)
+        lines!(a, ms, low, color=colors[i], linestyle = :dash, linewidth = 2.5)
+        lines!(a, ms, high, color=colors[i], linestyle = :dash, linewidth = 2.5)
         for _ in 1:100
             lines!(a, ms, ms .* sample(pm), label=nothing, color=(colors[i], 0.1))
         end
@@ -318,7 +331,7 @@ end
 # Table 1
 begin
     open(joinpath(@__DIR__, "..", "paper", "table1_content" * new_suffix * ".tex"), "w") do f
-        write(f, "\\begin{deluxetable}{llll}\n\\tablecolumns{3}\n\\tablecaption{\\label{tab:monepct} \$m_{1\\%}\$ for our various models and using different selection functions.}\n")
+        write(f, "\\begin{deluxetable}{llll}\n\\tablecolumns{3}\n\\tablecaption{\\label{tab:monepct} \$m_{1\\%}\$ for our various models and using different mass functions.}\n")
         write(f, "\\tablehead{\\colhead{Mass Function Model} & \\colhead{\$m_{1\\%} / M_\\odot\$ (90\\%)} & \\colhead{\$m_{1\\%} / M_\\odot\$ range (90\\%)}}\n")
         write(f, "\\startdata\n")
         for mf in [BrokenPowerLaw(), PowerLawGaussian()]

@@ -44,6 +44,8 @@ export pf_label_map, pf_var_name_map
 export distribution_quantile
 export bisect
 export hdi_interval
+export hpd_interval
+export quantile_interval
 export logscale_ticks
 export categorical_palette
 
